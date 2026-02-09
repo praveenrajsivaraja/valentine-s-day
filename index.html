@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Will you be my Valentine, Madhu?</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Quicksand:wght@500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="hearts-bg" aria-hidden="true"></div>
+  <div class="floating-hearts" id="floatingHearts" aria-hidden="true"></div>
+
+  <!-- Screen 1: A Secret Note For You -->
+  <section class="screen screen-secret-note" id="screenWelcome">
+    <div class="secret-note-content">
+      <h1 class="secret-note-title">Hey gorgeous here is a Secret Note For You ❤️</h1>
+      <p class="secret-note-subtitle">Click the envelope to open it...</p>
+      <button type="button" class="envelope-btn" id="btnOpenWelcome" aria-label="Open envelope">
+        <span class="envelope-icon">✉️</span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Screen 2: Will You Be My Valentine? -->
+  <main class="screen screen-question hidden" id="screenCard">
+    <div class="question-content">
+      <h1 class="question-title">Will you be my Valentine? 💕</h1>
+      <p class="question-subtitle" id="subtitle">Official invite from your long-distance boyfriend ❤️</p>
+      <div class="screen-card-buttons">
+        <button type="button" class="btn btn-yes" id="btnYes"><span class="btn-heart" aria-hidden="true">♥</span> YES!</button>
+        <button type="button" class="btn btn-no" id="btnNo">No :(</button>
+      </div>
+      <p class="question-no-note">Don't waste your time trying to click No 😉</p>
+    </div>
+  </main>
+
+  <div class="confetti-container" id="confettiContainer" aria-hidden="true"></div>
+
+  <!-- Screen 3: Success -->
+  <section class="screen screen-success success-message hidden" id="screenSuccess">
+    <p class="success-intro">Good choice Papa 😊</p>
+    <p class="success-unlocked">You just unlocked unlimited hugs, kisses, and cuddles (redeemable very soon I promise)</p>
+    <p class="success-forever">Now you're stuck with your crazy boyfriend forever ∞</p>
+    <div class="success-change-mind-wrap" id="successChangeMindWrap">
+      <button type="button" class="success-change-mind-btn" id="successChangeMindBtn">Wait... do you want to change your mind?</button>
+      <button type="button" class="btn btn-actually-no" id="btnActuallyNo" aria-label="Actually no">Actually... Yes 😈</button>
+    </div>
+
+    <div class="success-below-content hidden" id="successBelowContent">
+    <p class="success-hearts" id="successHearts" aria-hidden="true"></p>
+
+    <div class="success-rules-card">
+      <h3 class="success-rules-title">You already said YES, which means:</h3>
+      <ul class="success-rules-list">
+        <li>❌ No take-backs allowed</li>
+        <li>❌ You're legally mine now (I checked)</li>
+        <li>❌ Every "no" from now on = 10 extra kisses when we meet</li>
+        <li>✅ You're stuck with me FOREVER 😈</li>
+      </ul>
+      <p class="success-rules-footer">Deal with it 😉💕</p>
+    </div>
+
+    <div class="virtual-date-section">
+      <h3 class="virtual-date-title">Our Virtual Date Ideas 📱</h3>
+      <div class="virtual-date-list">
+        <div class="virtual-date-card virtual-date-card--pink">🎬 Netflix party + video call (I'll let you pick... maybe)</div>
+        <div class="virtual-date-card virtual-date-card--cream">🍕 Order the same food together & judge each other's eating habits</div>
+        <div class="virtual-date-card virtual-date-card--pink">🌙 Late night talks that somehow turn into sleeping thing</div>
+        <div class="virtual-date-card virtual-date-card--cream">🎵 Playlist exchange & argue about music taste (you're wrong btw)</div>
+        <div class="virtual-date-card virtual-date-card--pink">📸 Send me your selfies so I can simp shamelessly 🥰</div>
+        <div class="virtual-date-card virtual-date-card--cream">🎮 Play games together & watch you absolutely destroy me</div>
+      </div>
+    </div>
+
+    <p class="gift-section-title">Your coupons from me 💕</p>
+    <p class="gift-reveal-hint">Click a coupon to reveal it</p>
+    <div class="gift-wrap" id="giftWrap">
+      <div class="gift-inside visible" id="giftInside" aria-hidden="false">
+        <div class="gift-gallery gift-gallery--cards" id="giftGallery">
+          <div class="gift-coupon-item" data-coupon="1">
+            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 1">🎁 Coupon 1</button>
+            <div class="gift-coupon-text"> A day of yes pass</div>
+          </div>
+          <div class="gift-coupon-item" data-coupon="2">
+            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 2">🎁 Coupon 2</button>
+            <div class="gift-coupon-text"> An unlimited kiss pass</div>
+          </div>
+          <div class="gift-coupon-item" data-coupon="3">
+            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 3">🎁 Coupon 3</button>
+            <div class="gift-coupon-text"> A unlimited hug pass</div>
+          </div>
+          <div class="gift-coupon-item" data-coupon="4">
+            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 4">🎁 Coupon 4</button>
+            <div class="gift-coupon-text">An Unlimited cuddle pass</div>
+          </div>
+          <div class="gift-coupon-item" data-coupon="5">
+            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 5">🎁 Coupon 5</button>
+            <div class="gift-coupon-text"> One "Do a dare" pass</div>
+          </div>
+          <div class="gift-coupon-item" data-coupon="6">
+            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 6">🎁 Coupon 6</button>
+            <div class="gift-coupon-text"> One "As you wish" pass</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="secret-word-section" id="secretWordSection">
+      <h3 class="secret-word-title">Enter the special word only we know 🔐</h3>
+      <p class="secret-word-hint">Type the word we use just between us</p>
+      <form class="secret-word-form" id="secretWordForm" novalidate>
+        <input type="text" class="secret-word-input" id="secretWordInput" autocomplete="off" placeholder="Our secret word..." aria-label="Secret word" />
+        <button type="submit" class="btn btn-secret-submit" id="secretWordSubmit">Unlock memories</button>
+      </form>
+      <p class="secret-word-error hidden" id="secretWordError" role="alert">Think again.and try once more 💕</p>
+    </div>
+    </div>
+  </section>
+
+  <div class="memory-slideshow hidden" id="memorySlideshow" aria-hidden="true">
+    <div class="memory-slideshow-backdrop"></div>
+    <div class="memory-slideshow-content">
+      <p class="memory-slideshow-title">Our memories ♥</p>
+      <div class="memory-slideshow-image-wrap">
+        <img class="memory-slideshow-image" id="memorySlideshowImage" alt="Memory" />
+      </div>
+      <p class="memory-slideshow-caption" id="memorySlideshowCaption"></p>
+      <button type="button" class="memory-slideshow-close" id="memorySlideshowClose" aria-label="Close slideshow">✕ Close</button>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
