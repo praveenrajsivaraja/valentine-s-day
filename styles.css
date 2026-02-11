@@ -28,12 +28,57 @@ body {
   background: linear-gradient(165deg, #fff5f7 0%, #ffe8ee 38%, #ffdce6 70%, #ffd0dc 100%);
   color: var(--text);
   overflow-x: hidden;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
-/* Screens: full viewport panels – use entire screen */
+body.page-ready {
+  opacity: 1;
+}
+
+/* Header height used so screens start below it – no cropping, menu stays under header */
+:root {
+  --header-height: 3.5rem;
+}
+
+/* Page header – stays on top; menu must use z-index < 10 so it never overrides */
+.page-header {
+  position: sticky;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--header-height);
+  padding: 0.5rem 1rem;
+  background: rgba(255, 245, 247, 0.98);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid rgba(255, 182, 193, 0.4);
+  box-shadow: 0 2px 12px rgba(198, 50, 70, 0.08);
+  overflow: visible;
+  flex-shrink: 0;
+}
+
+.page-header-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 100%;
+}
+
+/* Screens sit below header so content is never cropped; menu (z-index < 10) stays under header */
 .screen {
   position: fixed;
-  inset: 0;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  bottom: 0;
   z-index: 1;
   display: flex;
   align-items: center;
@@ -41,7 +86,7 @@ body {
   padding: clamp(1rem, 3vw, 2rem);
   transition: opacity 0.4s ease, visibility 0.4s ease;
   width: 100%;
-  height: 100%;
+  height: calc(100vh - var(--header-height));
   overflow-y: auto;
 }
 
@@ -740,6 +785,18 @@ body {
   opacity: 0;
 }
 
+.secret-word-success {
+  margin: 0.75rem 0 0;
+  font-size: 0.95rem;
+  color: var(--rose-dark);
+  font-weight: 600;
+  min-height: 1.5em;
+}
+
+.secret-word-success.hidden {
+  display: none !important;
+}
+
 /* Memory slideshow overlay (running images after correct secret word) */
 .memory-slideshow {
   position: fixed;
@@ -784,15 +841,23 @@ body {
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
+.memory-slideshow-image-area {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
 .memory-slideshow-image-wrap {
   width: 50vw;
-  height: 50vh;
+  height: 70vh;
   max-width: 50vw;
-  max-height: 50vh;
+  max-height: 70vh;
   border-radius: 16px;
   overflow: hidden;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
-  background: #111;
+  background: #1a1a1e;
 }
 
 .memory-slideshow-image {
@@ -818,6 +883,43 @@ body {
 @keyframes memoryImageFade {
   from { opacity: 0; }
   to { opacity: 1; }
+}
+
+.memory-slideshow-prev,
+.memory-slideshow-next {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Quicksand", sans-serif;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #fff;
+  background: rgba(0, 0, 0, 0.4);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.memory-slideshow-prev {
+  left: 0.75rem;
+}
+
+.memory-slideshow-next {
+  right: 0.75rem;
+}
+
+.memory-slideshow-prev:hover,
+.memory-slideshow-next:hover {
+  background: rgba(0, 0, 0, 0.6);
+  transform: translateY(-50%) scale(1.1);
 }
 
 .memory-slideshow-close {
@@ -1134,7 +1236,29 @@ body {
   display: none !important;
 }
 
+/* Menu / nav: use class .page-menu or .page-nav and z-index stays below header (10) */
+.page-menu,
+.page-nav {
+  z-index: 5;
+}
+
 @media (max-width: 480px) {
+  :root {
+    --header-height: 3rem;
+  }
+
+  .page-header {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    min-height: var(--header-height);
+    padding: 0.4rem 0.75rem;
+  }
+
+  .page-header-title {
+    font-size: 0.95rem;
+  }
+
   .question-content {
     padding: 1.5rem 0;
   }

@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Quicksand:wght@500;600&display=swap" rel="stylesheet">
 </head>
-<body>
+<body data-secret-word="mama">
   <div class="hearts-bg" aria-hidden="true"></div>
   <div class="floating-hearts" id="floatingHearts" aria-hidden="true"></div>
 
@@ -28,7 +28,7 @@
   <main class="screen screen-question hidden" id="screenCard">
     <div class="question-content">
       <h1 class="question-title">Will you be my Valentine? 💕</h1>
-      <p class="question-subtitle" id="subtitle">Official invite from your long-distance boyfriend ❤️</p>
+      <p class="question-subtitle" id="subtitle">Official invite from your long-distance fiancee ❤️</p>
       <div class="screen-card-buttons">
         <button type="button" class="btn btn-yes" id="btnYes"><span class="btn-heart" aria-hidden="true">♥</span> YES!</button>
         <button type="button" class="btn btn-no" id="btnNo">No :(</button>
@@ -43,7 +43,7 @@
   <section class="screen screen-success success-message hidden" id="screenSuccess">
     <p class="success-intro">Good choice Papa 😊</p>
     <p class="success-unlocked">You just unlocked unlimited hugs, kisses, and cuddles (redeemable very soon I promise)</p>
-    <p class="success-forever">Now you're stuck with your crazy boyfriend forever ∞</p>
+    <p class="success-forever">Now you're stuck with your ME forever ∞</p>
     <div class="success-change-mind-wrap" id="successChangeMindWrap">
       <button type="button" class="success-change-mind-btn" id="successChangeMindBtn">Wait... do you want to change your mind?</button>
       <button type="button" class="btn btn-actually-no" id="btnActuallyNo" aria-label="Actually no">Actually... Yes 😈</button>
@@ -58,13 +58,13 @@
         <li>❌ No take-backs allowed</li>
         <li>❌ You're legally mine now (I checked)</li>
         <li>❌ Every "no" from now on = 10 extra kisses when we meet</li>
-        <li>✅ You're stuck with me FOREVER 😈</li>
+        <li>✅ You're stuck with your crazy fiancee (Me) FOREVER 😈</li>
       </ul>
       <p class="success-rules-footer">Deal with it 😉💕</p>
     </div>
 
     <div class="virtual-date-section">
-      <h3 class="virtual-date-title">Our Virtual Date Ideas 📱</h3>
+      <h3 class="virtual-date-title">I have some Virtual Date Ideas 📱</h3>
       <div class="virtual-date-list">
         <div class="virtual-date-card virtual-date-card--pink">🎬 Netflix party + video call (I'll let you pick... maybe)</div>
         <div class="virtual-date-card virtual-date-card--cream">🍕 Order the same food together & judge each other's eating habits</div>
@@ -108,7 +108,7 @@
       </div>
     </div>
 
-    <div class="secret-word-section" id="secretWordSection">
+    <div class="secret-word-section" id="secretWordSection" data-secret-word="i love you darloos">
       <h3 class="secret-word-title">Enter the special word only we know 🔐</h3>
       <p class="secret-word-hint">Type the word we use just between us</p>
       <form class="secret-word-form" id="secretWordForm" novalidate>
@@ -116,22 +116,30 @@
         <button type="submit" class="btn btn-secret-submit" id="secretWordSubmit">Unlock memories</button>
       </form>
       <p class="secret-word-error hidden" id="secretWordError" role="alert">Think again.and try once more 💕</p>
+      <p class="secret-word-success hidden" id="secretWordSuccess" role="status"></p>
     </div>
+    </div>
+
+    <div class="memory-slideshow hidden" id="memorySlideshow" aria-label="Photo memories slideshow">
+      <div class="memory-slideshow-backdrop" id="memorySlideshowBackdrop"></div>
+      <div class="memory-slideshow-content">
+        <h2 class="memory-slideshow-title">Our memories 💕</h2>
+        <div class="memory-slideshow-image-area">
+          <button type="button" class="memory-slideshow-prev" id="memorySlideshowPrev" aria-label="Previous photo">&lt;</button>
+          <div class="memory-slideshow-image-wrap">
+            <img class="memory-slideshow-image" id="memorySlideshowImage" src="" alt="" />
+          </div>
+          <button type="button" class="memory-slideshow-next" id="memorySlideshowNext" aria-label="Next photo">&gt;</button>
+        </div>
+        <p class="memory-slideshow-caption" id="memorySlideshowCaption"></p>
+        <button type="button" class="memory-slideshow-close" id="memorySlideshowClose" aria-label="Close slideshow">Close</button>
+      </div>
     </div>
   </section>
 
-  <div class="memory-slideshow hidden" id="memorySlideshow" aria-hidden="true">
-    <div class="memory-slideshow-backdrop"></div>
-    <div class="memory-slideshow-content">
-      <p class="memory-slideshow-title">Our memories ♥</p>
-      <div class="memory-slideshow-image-wrap">
-        <img class="memory-slideshow-image" id="memorySlideshowImage" alt="Memory" />
-      </div>
-      <p class="memory-slideshow-caption" id="memorySlideshowCaption"></p>
-      <button type="button" class="memory-slideshow-close" id="memorySlideshowClose" aria-label="Close slideshow">✕ Close</button>
-    </div>
-  </div>
-
   <script src="script.js"></script>
+  <script>
+    document.body.classList.add("page-ready");
+  </script>
 </body>
 </html>

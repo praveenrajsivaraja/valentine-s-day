@@ -1,57 +1,104 @@
-(function () {
+﻿(function () {
   "use strict";
 
-  const screenWelcome = document.getElementById("screenWelcome");
-  const screenCard = document.getElementById("screenCard");
-  const screenSuccess = document.getElementById("screenSuccess");
-  const btnOpenWelcome = document.getElementById("btnOpenWelcome");
-  const btnYes = document.getElementById("btnYes");
-  const btnNo = document.getElementById("btnNo");
-  const buttonsContainer = document.querySelector(".screen-card-buttons");
-  const subtitle = document.getElementById("subtitle");
-  const floatingHearts = document.getElementById("floatingHearts");
-  const confettiContainer = document.getElementById("confettiContainer");
-  const successHearts = document.getElementById("successHearts");
-  const giftFileInput = document.getElementById("giftFileInput");
-  const giftAddHint = document.getElementById("giftAddHint");
-  const secretWordForm = document.getElementById("secretWordForm");
-  const secretWordInput = document.getElementById("secretWordInput");
-  const secretWordError = document.getElementById("secretWordError");
-  const memorySlideshow = document.getElementById("memorySlideshow");
-  const memorySlideshowImage = document.getElementById("memorySlideshowImage");
-  const memorySlideshowClose = document.getElementById("memorySlideshowClose");
-  const memorySlideshowCaption = document.getElementById("memorySlideshowCaption");
-  const successChangeMindWrap = document.getElementById("successChangeMindWrap");
-  const successChangeMindBtn = document.getElementById("successChangeMindBtn");
-  const successBelowContent = document.getElementById("successBelowContent");
-  const btnActuallyNo = document.getElementById("btnActuallyNo");
+  // --- Config (secret word can be overridden via data attribute on body or form)
+  var SECRET_WORD_DEFAULT = "mama";
+  var NO_BUTTON_RUN_SPEED = 80;
+  var CONFETTI_COUNT = 60;
+  var FLOATING_HEARTS_COUNT = 12;
+  var HEART_SYMBOLS = ["♥", "💕", "💗", "❤", "💖"];
+  var SLIDESHOW_AUTO_INTERVAL_MS = 9000;
+  var SUCCESS_AUTO_NEXT_MS = 10000;
+  var successAutoNextTimeoutId = null;
 
-  const GIFT_STORAGE_KEY = "valentineGiftImages";
+  // Photo memories: caption = filename without extension; src = URL-encoded path
+  // Reference details (First mirror selfie): vertical mirror selfie, couple smiling; woman (left) long dark wavy hair,
+  // glasses, black long-sleeved top, blue jeans, bindi, thin gold chain with pendant; man (right) beard, white collared
+  // shirt, blue jeans, holding smartphone taking the selfie, green braided bracelet; indoors, well-lit mirror.
+  var APOSTROPHE_CURLY = "\u2019"; // right single quotation mark (often in filenames from phones/Word)
 
-  /* Change this to the special word only you two know */
-  const SECRET_WORD = "mama";
+  function captionFromSrc(rawPath) {
+    var name = rawPath.replace(/^photos\//, "");
+    var lastDot = name.lastIndexOf(".");
+    var base = lastDot === -1 ? name : name.slice(0, lastDot);
+    return base.replace( new RegExp(APOSTROPHE_CURLY, "g"), "'" );
+  }
 
-  const MEMORY_IMAGE_PATHS = [
-    "Photos/WIN_4269.JPG",
-    "Photos/WIN_4297.JPG",
-    "Photos/WIN_4307.JPG",
-    "Photos/WIN_4325.JPG",
-    "Photos/WIN_4328.JPG",
-    "Photos/WIN_4333.JPG",
+  function encodePhotoPath(rawPath) {
+    var slash = rawPath.indexOf("/");
+    if (slash === -1) return encodeURIComponent(rawPath);
+    var folder = rawPath.slice(0, slash + 1);
+    var filename = rawPath.slice(slash + 1);
+    return folder + encodeURIComponent(filename);
+  }
+
+  // Single source: path + caption per photo
+  var MEMORY_PHOTOS_RAW = [
+    { path: "photos/01-first-mirror-selfie.JPG", caption: "First mirror selfie, and it became my all-time favorite." },
+    { path: "photos/02-first-month-togetherness.JPG", caption: "First month of togetherness" },
+    { path: "photos/03-first-rooftop-dream.jpg", caption: "First-ever rooftop, like a dream. You, the ambiance, the food, and the music kept me high throughout the day." },
+    { path: "photos/04-love-came-back-to-me.JPG", caption: "For the first time, the love I gave came back to me." },
+    { path: "photos/05-the-gift.JPG", caption: "I didn't expect a gift, but it meant everything. I never expected anything before, because I never received it. Now, I have you." },
+    { path: "photos/06-waited-for-this-moment.JPG", caption: "I was supposed to do this earlier, but I waited for this moment." },
+    { path: "photos/07-engagement-friend-confidence.JPG", caption: "It wasn't just an engagement; it was the moment I found a friend I can rely on and love with all my confidence." },
+    { path: "photos/08-mayajal-beautiful.jpg", caption: "Mayajal… uff. I've visited it many times, yet you made the moment feel fresh, memorable, and beautiful." },
+    { path: "photos/09-first-rose.JPG", caption: "My first-ever rose, bought for a girl. Words fall short for how this feels." },
+    { path: "photos/10-first-adventure.jpg", caption: "Our first adventure, and the most memorable moment of my life so far" },
+    { path: "photos/11-first-video-call.jpg", caption: "Our first ever comfortable video call" },
+    { path: "photos/12-first-silfi-yes.jpg", caption: "Our first ever silfi, Honstly i was not ready for this i was preparing myself for a no as always but it was quiet diferent tat day i got yes" },
+    { path: "photos/13-first-shopping-date.jpg", caption: "Our first Shopping and date, I was super upset that day but the moment i saw you it changed me completly" },
+    { path: "photos/14-hangout-chennai.JPG", caption: "Our first-ever hangout in Chennai; you, the food, and the place were soo perfect." },
+    { path: "photos/15-late-night-dinner.JPG", caption: "That special late night dinner." },
+    { path: "photos/16-brownie-confidence.JPG", caption: "The brownie may look simple, but its impact on me was so delicious." },
+    { path: "photos/17-first-day-caught-up.jpg", caption: "The first day we caught up, finding love, laughter, drives, and endless moments." },
+    { path: "photos/18-go-cart.jpg", caption: "The go cart" },
+    { path: "photos/19-moment-safe-comfortable.jpg", caption: "The moment that made me feel safe and comfortable with you." },
+    { path: "photos/20-phone-first-gift.JPG", caption: "The phone was the first gift I planned for you that day. I still remember how adorably awkward you were trying to get my number." },
+    { path: "photos/21-secret-bus-travel.jpg", caption: "The secret bus travel" },
+    { path: "photos/22-cake-confidence.JPG", caption: "This cake may be simple, but it gave me a lot of confidence in you and your opinion." },
+    { path: "photos/23-formality-temple-meeting.JPG", caption: "This was just a formality; I was already married to you the day you sat wit me and spoke so comfortably in the temple during our first meeting." },
+    { path: "photos/24-comfortable-fam-vibe.JPG", caption: "This was the moment wher i felt soo confortable wher i found not just you and your entire fam is in my vibe." },
+    { path: "photos/25-best-gift-received.PNG", caption: "You are the best gift I've ever received." },
+    { path: "photos/26-all-time-fav.PNG", caption: "My favorite picture ever. Just look at how pretty my lady is… ufff." }
   ];
 
-  /* Caption for each memory image (edit to match your memories) */
-  const MEMORY_CAPTIONS = [
-    "A moment we'll never forget ♥",
-    "Together is our favourite place",
-    "This day meant everything",
-    "Us against the world",
-    "Forever and always",
-    "Our story, our memories",
-  ];
+  var MEMORY_PHOTOS = MEMORY_PHOTOS_RAW.map(function (item) {
+    return {
+      src: encodePhotoPath(item.path),
+      caption: item.caption
+    };
+  });
 
-  const noMessages = [
-    "Are you sure?",
+  // --- DOM refs
+  var screenWelcome = document.getElementById("screenWelcome");
+  var screenCard = document.getElementById("screenCard");
+  var screenSuccess = document.getElementById("screenSuccess");
+  var btnOpenWelcome = document.getElementById("btnOpenWelcome");
+  var btnYes = document.getElementById("btnYes");
+  var btnNo = document.getElementById("btnNo");
+  var subtitle = document.getElementById("subtitle");
+  var confettiContainer = document.getElementById("confettiContainer");
+  var successChangeMindWrap = document.getElementById("successChangeMindWrap");
+  var successChangeMindBtn = document.getElementById("successChangeMindBtn");
+  var btnActuallyNo = document.getElementById("btnActuallyNo");
+  var successBelowContent = document.getElementById("successBelowContent");
+  var successHearts = document.getElementById("successHearts");
+  var giftGallery = document.getElementById("giftGallery");
+  var secretWordForm = document.getElementById("secretWordForm");
+  var secretWordInput = document.getElementById("secretWordInput");
+  var secretWordError = document.getElementById("secretWordError");
+  var secretWordSuccess = document.getElementById("secretWordSuccess");
+  var memorySlideshow = document.getElementById("memorySlideshow");
+  var memorySlideshowImage = document.getElementById("memorySlideshowImage");
+  var memorySlideshowCaption = document.getElementById("memorySlideshowCaption");
+  var memorySlideshowClose = document.getElementById("memorySlideshowClose");
+  var memorySlideshowBackdrop = document.getElementById("memorySlideshowBackdrop");
+  var memorySlideshowPrev = document.getElementById("memorySlideshowPrev");
+  var memorySlideshowNext = document.getElementById("memorySlideshowNext");
+  var floatingHeartsContainer = document.getElementById("floatingHearts");
+  var buttonsContainer = document.querySelector(".screen-card-buttons");
+
+  var noMessages = [
     "I think ne thappa NO click panna try pannara da papa...",
     "Ingutu venam angutu polam...",
     "Venam Papaa....",
@@ -66,43 +113,90 @@
     "Olunga yes press pannara valeiya paru...."
   ];
 
-  const confettiColors = [
-    "#e63946",
-    "#ff6b6b",
-    "#ff9a9e",
-    "#fec89a",
-    "#c1121f",
-    "#ffcad4",
-  ];
-
-  if (!btnYes || !btnNo || !screenCard || !screenSuccess || !buttonsContainer) {
-    return;
+  function getSecretWord() {
+    var form = document.getElementById("secretWordForm");
+    var section = document.getElementById("secretWordSection");
+    var word = (form && form.getAttribute("data-secret-word")) ||
+               (section && section.getAttribute("data-secret-word")) ||
+               (document.body && document.body.getAttribute("data-secret-word"));
+    return (word && word.trim()) ? word.trim().toLowerCase() : SECRET_WORD_DEFAULT;
   }
 
-  let noHoverCount = 0;
+  function showScreen(screenElement) {
+    [screenWelcome, screenCard, screenSuccess].forEach(function (el) {
+      if (el) el.classList.add("hidden");
+    });
+    if (screenElement) screenElement.classList.remove("hidden");
+  }
 
+  function runConfetti() {
+    if (!confettiContainer) return;
+    var colors = ["#e63946", "#ff6b6b", "#ffb6c1", "#c9a227", "#fff5f5"];
+    for (var i = 0; i < CONFETTI_COUNT; i++) {
+      var isHeart = Math.random() > 0.5;
+      var el = document.createElement("div");
+      el.className = "confetti" + (isHeart ? " heart" : "");
+      if (isHeart) {
+        el.textContent = HEART_SYMBOLS[Math.floor(Math.random() * HEART_SYMBOLS.length)];
+      } else {
+        el.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+      }
+      el.style.left = Math.random() * 100 + "%";
+      el.style.animationDelay = Math.random() * 0.6 + "s";
+      el.style.animationDuration = (2.5 + Math.random() * 1.5) + "s";
+      confettiContainer.appendChild(el);
+      setTimeout(function (node) {
+        if (node.parentNode) node.parentNode.removeChild(node);
+      }, 4500, el);
+    }
+  }
+
+  function spawnFloatingHearts() {
+    if (!floatingHeartsContainer) return;
+    for (var i = 0; i < FLOATING_HEARTS_COUNT; i++) {
+      (function (index) {
+        setTimeout(function () {
+          var heart = document.createElement("span");
+          heart.className = "heart";
+          heart.textContent = HEART_SYMBOLS[index % HEART_SYMBOLS.length];
+          heart.style.left = Math.random() * 100 + "%";
+          heart.style.animationDelay = Math.random() * 4 + "s";
+          heart.style.animationDuration = (12 + Math.random() * 6) + "s";
+          floatingHeartsContainer.appendChild(heart);
+        }, index * 400);
+      })(i);
+    }
+  }
+
+  function fillSuccessHearts() {
+    if (!successHearts) return;
+    var count = 15;
+    var html = "";
+    for (var i = 0; i < count; i++) {
+      html += "<span class=\"success-heart\" aria-hidden=\"true\">" + HEART_SYMBOLS[i % HEART_SYMBOLS.length] + "</span>";
+    }
+    successHearts.innerHTML = html;
+  }
+
+  // No button runs away (reference: valentine-s-day — translate + reset on container leave)
   function getRandomOffset(maxPixels) {
     return Math.floor(Math.random() * (2 * maxPixels + 1)) - maxPixels;
   }
 
-  function getRandom(min, max) {
-    return Math.random() * (max - min) + min;
-  }
+  var noHoverCount = 0;
 
   function moveNoButton() {
-    const noRect = btnNo.getBoundingClientRect();
-    const padding = 60;
-    const maxDeltaX = Math.max(200, window.innerWidth / 2 - noRect.width - padding);
-    const maxDeltaY = Math.max(150, window.innerHeight / 2 - noRect.height - padding);
-
-    const deltaX = getRandomOffset(maxDeltaX);
-    const deltaY = getRandomOffset(maxDeltaY);
-
-    btnNo.style.transform = `translate(${deltaX}px, ${deltaY}px)`;
-
+    if (!btnNo) return;
+    var noRect = btnNo.getBoundingClientRect();
+    var padding = 60;
+    var maxDeltaX = Math.max(200, window.innerWidth / 2 - noRect.width - padding);
+    var maxDeltaY = Math.max(150, window.innerHeight / 2 - noRect.height - padding);
+    var deltaX = getRandomOffset(maxDeltaX);
+    var deltaY = getRandomOffset(maxDeltaY);
+    btnNo.style.transform = "translate(" + deltaX + "px, " + deltaY + "px)";
     if (subtitle) {
       noHoverCount += 1;
-      const index = Math.min(noHoverCount - 1, noMessages.length - 1);
+      var index = Math.min(noHoverCount - 1, noMessages.length - 1);
       subtitle.textContent = noMessages[index];
       subtitle.classList.add("surprise");
       setTimeout(function () {
@@ -112,17 +206,17 @@
   }
 
   function resetNoButton() {
-    btnNo.style.transform = "";
+    if (btnNo) btnNo.style.transform = "";
   }
 
   function moveActuallyNoButton() {
     if (!btnActuallyNo) return;
-    const rect = btnActuallyNo.getBoundingClientRect();
-    const padding = 60;
-    const maxDeltaX = Math.max(200, window.innerWidth / 2 - rect.width - padding);
-    const maxDeltaY = Math.max(150, window.innerHeight / 2 - rect.height - padding);
-    const deltaX = getRandomOffset(maxDeltaX);
-    const deltaY = getRandomOffset(maxDeltaY);
+    var rect = btnActuallyNo.getBoundingClientRect();
+    var padding = 60;
+    var maxDeltaX = Math.max(200, window.innerWidth / 2 - rect.width - padding);
+    var maxDeltaY = Math.max(150, window.innerHeight / 2 - rect.height - padding);
+    var deltaX = getRandomOffset(maxDeltaX);
+    var deltaY = getRandomOffset(maxDeltaY);
     btnActuallyNo.style.transform = "translate(" + deltaX + "px, " + deltaY + "px)";
   }
 
@@ -130,87 +224,19 @@
     if (btnActuallyNo) btnActuallyNo.style.transform = "";
   }
 
-  function createFloatingHearts() {
-    if (!floatingHearts) return;
-    const heartChars = ["♥", "❤", "💕"];
-    const count = 50;
-    for (let i = 0; i < count; i += 1) {
-      const el = document.createElement("span");
-      el.className = "heart";
-      el.textContent = heartChars[i % heartChars.length];
-      el.style.left = getRandom(0, 100) + "%";
-      el.style.animationDelay = getRandom(0, 20) + "s";
-      el.style.animationDuration = getRandom(10, 22) + "s";
-      el.style.fontSize = getRandom(0.85, 2) + "rem";
-      el.style.opacity = getRandom(0.2, 0.5).toFixed(2);
-      floatingHearts.appendChild(el);
-    }
+  function initNoButton() {
+    if (!btnNo || !buttonsContainer) return;
+    btnNo.addEventListener("mouseenter", moveNoButton);
+    btnNo.addEventListener("focus", moveNoButton);
+    btnNo.addEventListener("touchstart", function (e) {
+      e.preventDefault();
+      moveNoButton();
+    }, { passive: false });
+    buttonsContainer.addEventListener("mouseleave", resetNoButton);
   }
 
-  function createConfettiBurst() {
-    if (!confettiContainer) return;
-    const heartChar = "♥";
-    const count = 60;
-    for (let i = 0; i < count; i += 1) {
-      const el = document.createElement("span");
-      el.className = "confetti " + (i % 3 === 0 ? "heart" : "");
-      if (i % 3 === 0) {
-        el.textContent = heartChar;
-        el.style.color = confettiColors[Math.floor(Math.random() * confettiColors.length)];
-      } else {
-        el.style.backgroundColor = confettiColors[Math.floor(Math.random() * confettiColors.length)];
-      }
-      el.style.left = getRandom(20, 80) + "%";
-      el.style.top = "50%";
-      el.style.animationDelay = getRandom(0, 0.5) + "s";
-      el.style.animationDuration = getRandom(2, 4) + "s";
-      confettiContainer.appendChild(el);
-      setTimeout(function () {
-        el.remove();
-      }, 4500);
-    }
-  }
-
-  function showSuccessHearts() {
-    if (!successHearts) return;
-    let html = "";
-    for (let i = 0; i < 12; i += 1) {
-      html += "<span class=\"success-heart\" style=\"animation-delay: " + (i * 0.08) + "s\">♥</span>";
-    }
-    successHearts.innerHTML = html;
-  }
-
-  let successRevealTimeout = null;
-
-  function revealSuccessBelowContent() {
-    if (successRevealTimeout) {
-      clearTimeout(successRevealTimeout);
-      successRevealTimeout = null;
-    }
-    if (successChangeMindWrap) successChangeMindWrap.classList.add("hidden");
-    if (successBelowContent) successBelowContent.classList.remove("hidden");
-  }
-
-  function onYesClick() {
-    screenCard.classList.add("hidden");
-    createConfettiBurst();
-    screenSuccess.classList.remove("hidden");
-    showSuccessHearts();
-    loadGiftImages();
-    if (successBelowContent) successBelowContent.classList.add("hidden");
-    if (successChangeMindWrap) successChangeMindWrap.classList.remove("hidden");
-    successRevealTimeout = setTimeout(function () {
-      revealSuccessBelowContent();
-    }, 10000);
-  }
-
-  if (successChangeMindBtn) {
-    successChangeMindBtn.addEventListener("click", function () {
-      revealSuccessBelowContent();
-    });
-  }
-
-  if (btnActuallyNo && successChangeMindWrap) {
+  function initActuallyNoButton() {
+    if (!btnActuallyNo || !successChangeMindWrap) return;
     btnActuallyNo.addEventListener("mouseenter", moveActuallyNoButton);
     btnActuallyNo.addEventListener("focus", moveActuallyNoButton);
     btnActuallyNo.addEventListener("touchstart", function (e) {
@@ -220,279 +246,185 @@
     successChangeMindWrap.addEventListener("mouseleave", resetActuallyNoButton);
   }
 
-  function getStoredGiftImages() {
-    try {
-      const raw = localStorage.getItem(GIFT_STORAGE_KEY);
-      if (!raw) return null;
-      const parsed = JSON.parse(raw);
-      return Array.isArray(parsed) && parsed.length > 0 ? parsed : null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  function resolveImageSrc(path) {
-    if (!path) return path;
-    if (path.indexOf("data:") === 0 || path.indexOf("http:") === 0 || path.indexOf("https:") === 0) {
-      return path;
-    }
-    try {
-      return new URL(path, document.baseURI || window.location.href).href;
-    } catch (e) {
-      return path;
-    }
-  }
-
-  function openGiftItem(coverEl) {
-    const item = coverEl.closest(".gift-gallery-item");
-    if (!item) return;
-    const img = item.querySelector(".gift-item-image");
-    if (!img) return;
-    const dataSrc = img.getAttribute("data-src");
-    if (dataSrc) {
-      img.src = resolveImageSrc(dataSrc);
-      img.removeAttribute("data-src");
-      img.onerror = function () {
-        img.alt = "Image could not be loaded. Use a local server (e.g. npx serve .).";
-      };
-    }
-    img.classList.remove("hidden");
-    item.classList.add("opened");
-  }
-
-  function attachGiftItemHandlers(galleryEl) {
-    if (!galleryEl) return;
-    const covers = galleryEl.querySelectorAll(".gift-item-cover");
-    covers.forEach(function (cover) {
-      cover.addEventListener("click", function () {
-        openGiftItem(cover);
-      });
-    });
-  }
-
-  function renderGiftGalleryFromStorage(storedImages) {
-    const gallery = document.getElementById("giftGallery");
-    if (!gallery) return;
-    gallery.innerHTML = "";
-    storedImages.forEach(function (item, index) {
-      const src = typeof item === "string" ? item : (item && item.src);
-      if (!src) return;
-      const alt = (item && item.alt) || "Gift image " + (index + 1);
-      const itemEl = document.createElement("div");
-      itemEl.className = "gift-gallery-item";
-      itemEl.innerHTML =
-        "<button type=\"button\" class=\"gift-item-cover\" aria-label=\"Open image\"><span class=\"gift-item-icon\">🎁</span> Click to open</button>" +
-        "<img class=\"gift-item-image hidden\" data-src=\"" + src.replace(/"/g, "&quot;") + "\" alt=\"" + alt.replace(/"/g, "&quot;") + "\" loading=\"lazy\" />";
-      gallery.appendChild(itemEl);
-    });
-    attachGiftItemHandlers(gallery);
-  }
-
-  function loadGiftImages() {
-    const gallery = document.getElementById("giftGallery");
-    if (!gallery) return;
-    const stored = getStoredGiftImages();
-    if (stored && stored.length > 0) {
-      renderGiftGalleryFromStorage(stored);
-      return;
-    }
-  }
-
-  function attachCouponHandlers(galleryEl) {
-    if (!galleryEl) return;
-    galleryEl.addEventListener("click", function (e) {
-      const cover = e.target.closest(".gift-coupon-cover");
+  // Coupon click → reveal only this one; hide others when another is selected
+  function initCoupons() {
+    if (!giftGallery) return;
+    giftGallery.addEventListener("click", function (e) {
+      var cover = e.target.closest(".gift-coupon-cover");
       if (!cover) return;
-      const item = cover.closest(".gift-coupon-item");
+      var item = cover.closest(".gift-coupon-item");
       if (!item) return;
-      const gallery = document.getElementById("giftGallery");
-      if (!gallery) return;
-      const allItems = gallery.querySelectorAll(".gift-coupon-item");
-      allItems.forEach(function (el) {
-        el.classList.remove("selected");
-      });
+      var allItems = giftGallery.querySelectorAll(".gift-coupon-item");
+      for (var i = 0; i < allItems.length; i++) {
+        allItems[i].classList.remove("selected");
+      }
       item.classList.add("selected");
     });
   }
 
-  const giftGalleryEl = document.getElementById("giftGallery");
-  if (giftGalleryEl) attachCouponHandlers(giftGalleryEl);
+  // Secret word: first 2 attempts always wrong; custom messages per attempt
+  var secretWordAttemptCount = 0;
 
-  function getMemoryImageData() {
-    const defaultData = MEMORY_IMAGE_PATHS.map(function (path, i) {
-      return { src: resolveImageSrc(path), caption: MEMORY_CAPTIONS[i] || "Our memory ♥" };
-    });
-    const gallery = document.getElementById("giftGallery");
-    if (!gallery) return defaultData;
-    const images = gallery.querySelectorAll(".gift-item-image");
-    if (!images || images.length === 0) return defaultData;
-    const data = [];
-    images.forEach(function (img, i) {
-      const raw = img.getAttribute("data-src") || img.src;
-      if (!raw) return;
-      const src = resolveImageSrc(raw);
-      let caption = "Our memory ♥";
-      const pathIndex = MEMORY_IMAGE_PATHS.findIndex(function (p) {
-        return raw.indexOf(p) !== -1 || (img.getAttribute("data-src") && img.getAttribute("data-src").indexOf(p) !== -1);
-      });
-      if (pathIndex !== -1 && MEMORY_CAPTIONS[pathIndex]) caption = MEMORY_CAPTIONS[pathIndex];
-      else if (MEMORY_CAPTIONS[i]) caption = MEMORY_CAPTIONS[i];
-      data.push({ src: src, caption: caption });
-    });
-    return data.length > 0 ? data : defaultData;
-  }
-
-  let memorySlideshowInterval = null;
-
-  function startMemorySlideshow() {
-    const data = getMemoryImageData();
-    if (!memorySlideshow || !memorySlideshowImage || data.length === 0) return;
-    memorySlideshow.classList.remove("hidden");
-    memorySlideshow.setAttribute("aria-hidden", "false");
-    let index = 0;
-    memorySlideshowImage.src = data[0].src;
-    if (memorySlideshowCaption) memorySlideshowCaption.textContent = data[0].caption;
-    memorySlideshowImage.onerror = function () {
-      memorySlideshowImage.alt = "Image could not be loaded.";
-    };
-    if (memorySlideshowInterval) clearInterval(memorySlideshowInterval);
-    memorySlideshowInterval = setInterval(function () {
-      index = (index + 1) % data.length;
-      memorySlideshowImage.src = data[index].src;
-      if (memorySlideshowCaption) memorySlideshowCaption.textContent = data[index].caption;
-    }, 4000);
-  }
-
-  function stopMemorySlideshow() {
-    if (memorySlideshowInterval) {
-      clearInterval(memorySlideshowInterval);
-      memorySlideshowInterval = null;
-    }
-    if (memorySlideshow) {
-      memorySlideshow.classList.add("hidden");
-      memorySlideshow.setAttribute("aria-hidden", "true");
+  function setSecretWordErrorMessage() {
+    if (!secretWordError) return;
+    secretWordError.classList.remove("hidden");
+    if (secretWordAttemptCount === 1) {
+      secretWordError.textContent = "Note : It has 4 words but give me a kisses to get the hint 😉";
+    } else if (secretWordAttemptCount === 2) {
+      secretWordError.textContent = "Note : This is the  last change give me 5 kisses to get the hint or else you will be in trouble 😈 ";
+    } else {
+      var kissesCount = 10 + (secretWordAttemptCount - 3) * 5;
+      secretWordError.textContent = "Now you have no other choice give me " + kissesCount + " kisses to get the hint 💕";
     }
   }
 
-  let secretWordAttemptCount = 0;
-
-  if (secretWordForm && secretWordInput && secretWordError) {
+  function initSecretWord() {
+    if (!secretWordForm || !secretWordInput) return;
     secretWordForm.addEventListener("submit", function (e) {
       e.preventDefault();
-      const entered = (secretWordInput.value || "").trim().toLowerCase();
-      const expected = (SECRET_WORD || "").toLowerCase();
+      var value = (secretWordInput.value || "").trim().toLowerCase();
+      var expected = getSecretWord();
+      if (secretWordError) secretWordError.classList.add("hidden");
+      if (secretWordSuccess) secretWordSuccess.classList.add("hidden");
+
       secretWordAttemptCount += 1;
-      secretWordError.classList.remove("hidden");
+      var isForcedWrong = secretWordAttemptCount <= 2;
+      var isThirdAttempt = secretWordAttemptCount === 3;
+      var actuallyCorrect = value === expected;
 
-      if (secretWordAttemptCount === 1) {
-        secretWordError.textContent = "Note : It has 4 letters but give me a kisses to get the hint 😉";
-      } else if (secretWordAttemptCount === 2) {
-        secretWordError.textContent = "Note : This is the  last change give me 5 kisses to get the hint or else you will be in trouble 😈 ";
+      if (isForcedWrong || (isThirdAttempt && !actuallyCorrect)) {
+        setSecretWordErrorMessage();
+        return;
+      }
+
+      if (actuallyCorrect) {
+        if (secretWordSuccess) {
+          secretWordSuccess.textContent = "You remembered! Here are our memories 💕";
+          secretWordSuccess.classList.remove("hidden");
+        }
+        showMemorySlideshow();
       } else {
-        if (entered === expected) {
-          secretWordError.classList.add("hidden");
-          secretWordInput.value = "";
-          startMemorySlideshow();
-          return;
-        }
-        const kissesCount = 10 + (secretWordAttemptCount - 3) * 5;
-        secretWordError.textContent = "Now you have no other choice give me " + kissesCount + " kisses to get the hint 💕";
+        setSecretWordErrorMessage();
       }
     });
   }
 
-  if (memorySlideshowClose) {
-    memorySlideshowClose.addEventListener("click", stopMemorySlideshow);
-  }
+  var currentMemoryIndex = 0;
+  var slideshowAutoIntervalId = null;
 
-  function saveImagesToStorage(files, callback) {
-    if (!files || files.length === 0) {
-      if (callback) callback(0);
-      return;
-    }
-    const results = [];
-    let done = 0;
-    const total = files.length;
-    function maybeFinish() {
-      done += 1;
-      if (done === total) {
-        try {
-          const existing = getStoredGiftImages() || [];
-          const combined = existing.concat(results);
-          localStorage.setItem(GIFT_STORAGE_KEY, JSON.stringify(combined));
-          if (callback) callback(combined.length);
-        } catch (e) {
-          if (callback) callback(-1);
-        }
-      }
-    }
-    for (let i = 0; i < files.length; i += 1) {
-      const file = files[i];
-      if (!file.type || file.type.indexOf("image/") !== 0) {
-        maybeFinish();
-        continue;
-      }
-      const reader = new FileReader();
-      reader.onload = function (e) {
-        const dataUrl = e.target && e.target.result;
-        if (dataUrl) results.push({ src: dataUrl, alt: file.name });
-        maybeFinish();
-      };
-      reader.onerror = maybeFinish;
-      reader.readAsDataURL(file);
+  function stopSlideshowAuto() {
+    if (slideshowAutoIntervalId !== null) {
+      clearInterval(slideshowAutoIntervalId);
+      slideshowAutoIntervalId = null;
     }
   }
 
-  if (giftFileInput) {
-    giftFileInput.addEventListener("change", function () {
-      const files = this.files;
-      if (!files || files.length === 0) return;
-      saveImagesToStorage(Array.from(files), function (count) {
-        if (giftAddHint) {
-          if (count > 0) {
-            giftAddHint.textContent = count + " photo(s) added to your gift!";
-            giftAddHint.classList.add("gift-add-success");
-          } else if (count === -1) {
-            giftAddHint.textContent = "Storage full or error. Try fewer/smaller images.";
-            giftAddHint.classList.remove("gift-add-success");
-          }
-        }
-        giftFileInput.value = "";
+  function showMemorySlideshow() {
+    if (!memorySlideshow || !MEMORY_PHOTOS.length) return;
+    stopSlideshowAuto();
+    currentMemoryIndex = 0;
+    memorySlideshow.classList.remove("hidden");
+    setMemorySlide(0);
+    slideshowAutoIntervalId = setInterval(function () {
+      setMemorySlide(currentMemoryIndex + 1);
+    }, SLIDESHOW_AUTO_INTERVAL_MS);
+  }
+
+  function hideMemorySlideshow() {
+    if (memorySlideshow) memorySlideshow.classList.add("hidden");
+    stopSlideshowAuto();
+  }
+
+  function setMemorySlide(index) {
+    if (index < 0) index = MEMORY_PHOTOS.length - 1;
+    if (index >= MEMORY_PHOTOS.length) index = 0;
+    currentMemoryIndex = index;
+    var item = MEMORY_PHOTOS[currentMemoryIndex];
+    if (memorySlideshowImage) {
+      memorySlideshowImage.src = item.src;
+      memorySlideshowImage.alt = item.caption;
+    }
+    if (memorySlideshowCaption) memorySlideshowCaption.textContent = item.caption;
+  }
+
+  function initMemorySlideshow() {
+    if (memorySlideshowClose) {
+      memorySlideshowClose.addEventListener("click", hideMemorySlideshow);
+    }
+    if (memorySlideshowBackdrop) {
+      memorySlideshowBackdrop.addEventListener("click", hideMemorySlideshow);
+    }
+    if (memorySlideshowPrev) {
+      memorySlideshowPrev.addEventListener("click", function (e) {
+        e.stopPropagation();
+        setMemorySlide(currentMemoryIndex - 1);
       });
-    });
+    }
+    if (memorySlideshowNext) {
+      memorySlideshowNext.addEventListener("click", function (e) {
+        e.stopPropagation();
+        setMemorySlide(currentMemoryIndex + 1);
+      });
+    }
+    if (memorySlideshowImage) {
+      memorySlideshowImage.addEventListener("click", function (e) {
+        e.stopPropagation();
+        setMemorySlide(currentMemoryIndex + 1);
+      });
+    }
   }
 
+  // --- Wire UI
   if (btnOpenWelcome) {
     btnOpenWelcome.addEventListener("click", function () {
-      if (screenWelcome) screenWelcome.classList.add("hidden");
-      if (screenCard) screenCard.classList.remove("hidden");
-    });
-    btnOpenWelcome.addEventListener("keydown", function (e) {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        btnOpenWelcome.click();
-      }
+      showScreen(screenCard);
     });
   }
 
-  btnNo.addEventListener("mouseenter", moveNoButton);
-  btnNo.addEventListener("focus", moveNoButton);
+  function moveToSuccessNextScreen() {
+    if (successChangeMindWrap) successChangeMindWrap.classList.add("hidden");
+    if (successBelowContent) successBelowContent.classList.remove("hidden");
+  }
 
-  btnNo.addEventListener("touchstart", function (e) {
-    e.preventDefault();
-    moveNoButton();
-  }, { passive: false });
+  if (btnYes) {
+    btnYes.addEventListener("click", function () {
+      if (successAutoNextTimeoutId !== null) {
+        clearTimeout(successAutoNextTimeoutId);
+        successAutoNextTimeoutId = null;
+      }
+      runConfetti();
+      showScreen(screenSuccess);
+      fillSuccessHearts();
+      successAutoNextTimeoutId = setTimeout(function () {
+        successAutoNextTimeoutId = null;
+        moveToSuccessNextScreen();
+      }, SUCCESS_AUTO_NEXT_MS);
+    });
+  }
 
-  buttonsContainer.addEventListener("mouseleave", resetNoButton);
+  initNoButton();
+  initActuallyNoButton();
+  initCoupons();
+  initSecretWord();
+  initMemorySlideshow();
 
-  btnYes.addEventListener("click", onYesClick);
+  if (successChangeMindBtn) {
+    successChangeMindBtn.addEventListener("click", function () {
+      if (successChangeMindWrap) successChangeMindWrap.classList.add("hidden");
+      if (successBelowContent) successBelowContent.classList.remove("hidden");
+    });
+  }
 
-  btnYes.addEventListener("keydown", function (e) {
-    if (e.key === "Enter" || e.key === " ") {
-      e.preventDefault();
-      onYesClick();
-    }
-  });
+  if (btnActuallyNo) {
+    btnActuallyNo.addEventListener("click", function () {
+      if (successAutoNextTimeoutId !== null) {
+        clearTimeout(successAutoNextTimeoutId);
+        successAutoNextTimeoutId = null;
+      }
+      runConfetti();
+      moveToSuccessNextScreen();
+    });
+  }
 
-  createFloatingHearts();
+  spawnFloatingHearts();
 })();
