@@ -10,6 +10,10 @@
   --glow: rgba(255, 105, 135, 0.45);
   --card-shadow: 0 20px 50px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(255, 255, 255, 0.9);
   --card-shadow-hover: 0 28px 60px rgba(198, 50, 70, 0.18), 0 0 0 1px rgba(255, 255, 255, 0.95);
+  --box-pink: #e4b8c8;
+  --rose-gold: linear-gradient(135deg, #8b0000 0%, #ffcccc 50%, #b22222 100%);
+  --ribbon-deep: #8b0000;
+  --ribbon-light: #dc143c;
 }
 
 *,
@@ -97,10 +101,51 @@ body.page-ready {
   pointer-events: none;
 }
 
-/* Screen 1: A Secret Note For You */
+/* Screen 1: Home / Welcome (Hey Darling, I HAVE SOMETHING FOR YOU) */
 .screen-secret-note {
   z-index: 2;
 }
+
+/* Static and big hearts – home screen only */
+.home-static-hearts {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.home-heart {
+  position: absolute;
+  line-height: 1;
+  color: rgba(255, 182, 193, 0.35);
+}
+
+.home-heart--big {
+  font-size: clamp(3rem, 12vw, 7rem);
+  opacity: 0.25;
+}
+
+.home-heart--small {
+  font-size: clamp(1rem, 4vw, 1.75rem);
+  opacity: 0.4;
+}
+
+.home-heart--1 { left: 3%; top: 8%; }
+.home-heart--2 { right: 5%; top: 12%; }
+.home-heart--3 { left: 10%; bottom: 15%; }
+.home-heart--4 { right: 8%; bottom: 20%; }
+.home-heart--5 { left: 50%; top: 45%; transform: translate(-50%, -50%); font-size: clamp(4rem, 14vw, 8rem); opacity: 0.15; }
+.home-heart--6 { left: 15%; top: 25%; }
+.home-heart--7 { right: 18%; top: 30%; }
+.home-heart--8 { left: 8%; bottom: 35%; }
+.home-heart--9 { right: 12%; bottom: 28%; }
+.home-heart--10 { left: 25%; top: 55%; }
+.home-heart--11 { right: 28%; top: 50%; }
+.home-heart--12 { left: 70%; bottom: 40%; }
+.home-heart--13 { right: 5%; top: 40%; }
+.home-heart--14 { left: 5%; bottom: 50%; }
+.home-heart--15 { right: 35%; bottom: 10%; }
 
 .secret-note-content {
   text-align: center;
@@ -108,6 +153,38 @@ body.page-ready {
   max-width: min(480px, 92vw);
   padding: 2rem;
   animation: fadeInDown 0.8s ease;
+}
+
+.home-content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.home-greeting {
+  font-family: "Dancing Script", cursive;
+  font-size: clamp(6.83rem, 19.5vw, 6.76rem);
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 0.25rem;
+  line-height: 1.2;
+  transform: rotate(-2deg);
+  text-align: center;
+  white-space: nowrap;
+}
+
+.home-tagline {
+  font-family: "Quicksand", sans-serif;
+  font-size: clamp(0.75rem, 2.8vw, 1rem);
+  font-weight: 500;
+  color: var(--text);
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  margin: 0 0 2rem;
+  transform: rotate(-2deg);
+  text-align: center;
 }
 
 .secret-note-title {
@@ -123,47 +200,213 @@ body.page-ready {
   font-size: 1rem;
   color: var(--text);
   opacity: 0.85;
-  margin: 0 0 2rem;
+  margin: 0 0 1.5rem;
 }
 
-.envelope-btn {
-  display: inline-flex;
+/* Row: "Tap to open..." + arrow on left, gift box on right */
+.gift-tap-row {
+  display: flex;
   align-items: center;
   justify-content: center;
-  width: 120px;
-  height: 90px;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.gift-tap-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.25rem;
+}
+
+.gift-tap-text {
+  font-family: "Caveat", cursive;
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: #5c3a4d;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.gift-tap-arrow {
+  width: 72px;
+  height: 36px;
+  color: #6b4c5c;
+  margin-left: 0.25rem;
+}
+
+.gift-tap-arrow-spring {
+  animation: springBounce 2s ease-in-out infinite;
+}
+
+@keyframes springBounce {
+  0%, 100% { transform: translateX(0) scale(1); }
+  30% { transform: translateX(4px) scale(1.02); }
+  60% { transform: translateX(-1px) scale(0.99); }
+}
+
+/* Gift box – exquisitely crafted (lid opens on click), 10% smaller */
+.gift-container {
+  position: relative;
+  width: 162px;
+  height: 180px;
   padding: 0;
   border: none;
   background: transparent;
   cursor: pointer;
-  transition: transform 0.25s ease, filter 0.25s ease;
-  animation: envelopePulse 2s ease-in-out infinite;
+  font-family: "Playfair Display", serif;
+  transition: transform 0.3s ease;
 }
 
-.envelope-btn:hover {
-  transform: scale(1.1);
-  filter: drop-shadow(0 8px 20px var(--shadow));
-  animation: none;
+.gift-container:hover {
+  transform: scale(1.05);
 }
 
-.envelope-btn:active {
-  transform: scale(0.98);
-}
-
-.envelope-btn:focus-visible {
+.gift-container:focus-visible {
   outline: 2px solid var(--rose);
-  outline-offset: 4px;
+  outline-offset: 6px;
+  border-radius: 12px;
+}
+
+.gift-container--image {
+  width: auto;
+  height: auto;
+  max-width: 180px;
+}
+
+.gift-container--image .gift-box-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 180px;
+  pointer-events: none;
+}
+
+.gift-container .lid-group {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  z-index: 10;
+  transition: all 0.8s cubic-bezier(0.5, -0.5, 0.1, 1.5);
+}
+
+.gift-container.open .lid-group {
+  transform: translateY(-126px) rotate(-5deg);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gift-container .bow-wrap {
+  position: absolute;
+  top: -43px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  width: 117px;
+  height: 63px;
+}
+
+.gift-container .loop {
+  position: absolute;
+  width: 52px;
+  height: 34px;
+  background: var(--ribbon-deep);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50% 50% 10% 50%;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.gift-container .loop.l1 { left: 0; transform: rotate(-10deg); top: 7px; }
+.gift-container .loop.l2 { right: 0; left: auto; transform: rotate(10deg) scaleX(-1); top: 7px; }
+.gift-container .loop.l3 { left: 11px; transform: rotate(-30deg) scale(0.8); top: -4px; background: var(--ribbon-light); }
+.gift-container .loop.l4 { right: 11px; left: auto; transform: rotate(30deg) scaleX(-1) scale(0.8); top: -4px; background: var(--ribbon-light); }
+
+.gift-container .bow-knot {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 27px;
+  height: 27px;
+  background: var(--rose-gold);
   border-radius: 8px;
+  z-index: 5;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
-.envelope-icon {
-  font-size: 4.5rem;
-  line-height: 1;
+.gift-container .lid {
+  width: 169px;
+  height: 38px;
+  margin-left: -4px;
+  background: var(--box-pink);
+  border-radius: 5px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.25);
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.6);
 }
 
-@keyframes envelopePulse {
-  0%, 100% { transform: scale(1); }
-  50% { transform: scale(1.05); }
+.gift-container .ribbon-v-lid {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 38px !important;
+  background: var(--rose-gold);
+  border-radius: 0;
+}
+
+.gift-container .box-body {
+  width: 162px;
+  height: 149px;
+  background: var(--box-pink);
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  border-radius: 0 0 10px 10px;
+  box-shadow: inset 0 -10px 30px rgba(0, 0, 0, 0.1), 0 20px 50px rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.gift-container .ribbon-v {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 38px;
+  height: 100%;
+  background: var(--rose-gold);
+}
+
+.gift-container .message {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  color: var(--ribbon-deep);
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-align: center;
+  width: 90%;
+  opacity: 0;
+  letter-spacing: 2px;
+  transition: opacity 0.5s 0.4s;
+}
+
+.gift-container.open .message {
+  opacity: 1;
+}
+
+.gift-container .gift-hint {
+  position: absolute;
+  bottom: -47px;
+  left: 0;
+  width: 100%;
+  margin: 0;
+  text-align: center;
+  color: var(--text);
+  letter-spacing: 4px;
+  font-size: 0.65rem;
+  opacity: 0.7;
+  font-family: "Quicksand", sans-serif;
 }
 
 .hearts-bg {
@@ -174,6 +417,50 @@ body.page-ready {
     radial-gradient(circle at 20% 30%, rgba(255, 182, 193, 0.4) 0%, transparent 50%),
     radial-gradient(circle at 80% 70%, rgba(255, 192, 203, 0.3) 0%, transparent 50%);
   z-index: 0;
+}
+
+.hearts-bg-big {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.heart-bg {
+  position: absolute;
+  font-size: clamp(4rem, 12vw, 8rem);
+  color: rgba(255, 182, 193, 0.18);
+  line-height: 1;
+  animation: heartBgFloat 20s ease-in-out infinite;
+}
+
+.heart-bg--1 { left: 5%; top: 10%; animation-delay: 0s; }
+.heart-bg--2 { right: 8%; top: 25%; animation-delay: -4s; font-size: clamp(3rem, 10vw, 6rem); }
+.heart-bg--3 { left: 15%; bottom: 20%; animation-delay: -8s; font-size: clamp(3.5rem, 11vw, 7rem); }
+.heart-bg--4 { right: 12%; bottom: 15%; animation-delay: -12s; }
+.heart-bg--5 { left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: clamp(5rem, 14vw, 9rem); animation-delay: -6s; opacity: 0.12; }
+.heart-bg--6 { left: 25%; top: 35%; animation-delay: -2s; font-size: clamp(2.5rem, 8vw, 5rem); opacity: 0.14; }
+.heart-bg--7 { right: 25%; top: 40%; animation-delay: -7s; font-size: clamp(3rem, 9vw, 5.5rem); opacity: 0.15; }
+.heart-bg--8 { left: 8%; bottom: 35%; animation-delay: -10s; font-size: clamp(2.8rem, 8.5vw, 5.2rem); opacity: 0.13; }
+.heart-bg--9 { right: 18%; bottom: 40%; animation-delay: -3s; font-size: clamp(2.6rem, 7.5vw, 4.8rem); opacity: 0.14; }
+.heart-bg--10 { left: 45%; top: 15%; animation-delay: -5s; font-size: clamp(2.4rem, 7vw, 4.5rem); opacity: 0.12; }
+
+@keyframes heartBgFloat {
+  0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.18; }
+  33% { transform: translate(3%, -2%) scale(1.03); opacity: 0.22; }
+  66% { transform: translate(-2%, 2%) scale(0.98); opacity: 0.15; }
+}
+
+@keyframes heartBgFloatCenter {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.12; }
+  33% { transform: translate(-50%, -50%) scale(1.05); opacity: 0.15; }
+  66% { transform: translate(-50%, -50%) scale(0.97); opacity: 0.1; }
+}
+
+.heart-bg--5 {
+  opacity: 0.12;
+  animation-name: heartBgFloatCenter;
 }
 
 /* Floating hearts – everywhere on screen with bloat (pulse) */
@@ -190,6 +477,12 @@ body.page-ready {
   font-size: 1.25rem;
   opacity: 0.35;
   animation: floatHeart 14s ease-in-out infinite;
+}
+
+/* Falling hearts – from top to bottom (same container, different animation) */
+.floating-hearts .heart-fall {
+  animation-name: heartFall;
+  animation-iteration-count: infinite;
 }
 
 @keyframes floatHeart {
@@ -214,6 +507,32 @@ body.page-ready {
   }
   100% {
     transform: translateY(-15vh) translateX(-5px) rotate(360deg) scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes heartFall {
+  0%, 100% {
+    transform: translateY(-15vh) translateX(0) rotate(0deg) scale(1);
+    opacity: 0;
+  }
+  5% {
+    opacity: 0.35;
+  }
+  25% {
+    transform: translateY(25vh) translateX(10px) rotate(90deg) scale(1.15);
+  }
+  50% {
+    transform: translateY(55vh) translateX(-8px) rotate(180deg) scale(1);
+  }
+  75% {
+    transform: translateY(85vh) translateX(6px) rotate(270deg) scale(1.1);
+  }
+  95% {
+    opacity: 0.2;
+  }
+  100% {
+    transform: translateY(110vh) translateX(-4px) rotate(360deg) scale(1);
     opacity: 0;
   }
 }
@@ -418,7 +737,7 @@ body.page-ready {
 
 /* Success screen (Screen 3) – full viewport */
 .screen-success.success-message {
-  z-index: 15;
+  z-index: 25;
   align-self: stretch;
   align-items: center;
   min-height: 100vh;
@@ -434,6 +753,33 @@ body.page-ready {
 
 .success-message.hidden {
   display: none;
+}
+
+/* Hug video – shown when Yes is selected; never collapse or hide */
+.success-hug-video-wrap {
+  flex-shrink: 0;
+  width: 100%;
+  max-width: min(320px, 85vw);
+  margin: 0 auto 0.75rem;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 8px 24px var(--shadow);
+  animation: fadeInDown 0.5s ease both;
+}
+
+.success-hug-video {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.teddy-hug-text {
+  font-family: "Quicksand", sans-serif;
+  font-size: clamp(1rem, 3vw, 1.2rem);
+  color: var(--rose-dark);
+  margin: 0 0 1rem;
+  text-align: center;
+  animation: fadeInDown 0.5s 0.25s ease both;
 }
 
 /* Success screen: intro copy (Good choice babu, etc.) */
@@ -480,6 +826,15 @@ body.page-ready {
   display: none !important;
 }
 
+.success-change-mind-buttons {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .success-change-mind-btn {
   font-size: 0.95rem;
   color: var(--text);
@@ -521,6 +876,24 @@ body.page-ready {
 }
 
 .btn-actually-no:hover {
+  transform: scale(1.03);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.btn-success-no {
+  background: linear-gradient(145deg, #ebe0e0, #e2d5d5);
+  color: var(--text);
+  font-size: 1rem;
+  padding: 0.6rem 1.25rem;
+  margin: 0;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+  transition: transform 0.08s ease-out, box-shadow 0.2s ease;
+}
+
+.btn-success-no:hover {
   transform: scale(1.03);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
 }
@@ -698,6 +1071,110 @@ body.page-ready {
   align-items: center;
   width: 100%;
   max-width: min(1100px, 95vw);
+}
+
+/* Quiz section (before secret word) */
+.quiz-section {
+  width: 100%;
+  max-width: min(420px, 92vw);
+  margin: 2rem auto;
+  padding: 1.5rem;
+  text-align: center;
+}
+
+.quiz-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 1rem;
+}
+
+.quiz-question {
+  font-family: "Quicksand", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 1rem;
+  line-height: 1.4;
+}
+
+.quiz-options {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: stretch;
+  margin-bottom: 1rem;
+}
+
+.quiz-option-btn {
+  padding: 0.75rem 1rem;
+  font-family: "Quicksand", sans-serif;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text);
+  background: rgba(255, 252, 253, 0.95);
+  border: 1px solid rgba(255, 182, 193, 0.4);
+  border-radius: 12px;
+  cursor: pointer;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+  text-align: center;
+}
+
+.quiz-option-btn:hover {
+  background: #fff;
+  border-color: var(--rose);
+  transform: scale(1.02);
+}
+
+.quiz-option-btn:focus-visible {
+  outline: 2px solid var(--rose);
+  outline-offset: 2px;
+}
+
+.quiz-phone-input {
+  width: 100%;
+  max-width: 280px;
+  padding: 0.75rem 1rem;
+  font-family: "Quicksand", sans-serif;
+  font-size: 1rem;
+  border: 1px solid rgba(255, 182, 193, 0.4);
+  border-radius: 12px;
+  background: rgba(255, 252, 253, 0.95);
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  box-sizing: border-box;
+}
+
+.quiz-phone-input:focus {
+  outline: none;
+  border-color: var(--rose);
+}
+
+.quiz-phone-input::placeholder {
+  color: var(--text);
+  opacity: 0.6;
+}
+
+.quiz-next-btn {
+  margin-top: 0.25rem;
+}
+
+.quiz-progress {
+  font-size: 0.85rem;
+  color: var(--text);
+  opacity: 0.8;
+  margin: 0;
+}
+
+.modal-quiz-complete .modal-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 1.5rem;
+  text-align: center;
+  line-height: 1.4;
 }
 
 /* Secret word section (end of success screen) */
@@ -1224,6 +1701,8 @@ body.page-ready {
 
 .success-hearts .success-heart {
   display: inline-block;
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
   animation: heartsPulse 1.2s ease-in-out infinite;
 }
 
@@ -1234,6 +1713,687 @@ body.page-ready {
 
 .hidden {
   display: none !important;
+}
+
+/* ----- Modals (Perks, Pros/Cons) ----- */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.5);
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-overlay.hidden {
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.modal-card {
+  position: relative;
+  background: #fff;
+  border-radius: 20px;
+  padding: 2rem;
+  max-width: min(420px, 92vw);
+  width: 100%;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+  animation: modalAppear 0.35s ease;
+}
+
+.modal-perks .modal-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 1rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.modal-emoji {
+  text-align: center;
+  font-size: 2rem;
+  margin: 0 0 1.5rem;
+}
+
+.modal-close {
+  position: absolute;
+  top: 0.75rem;
+  right: 0.75rem;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 1.5rem;
+  line-height: 1;
+  color: var(--text);
+  cursor: pointer;
+  opacity: 0.7;
+}
+
+.modal-close:hover {
+  opacity: 1;
+}
+
+.btn-modal-ok {
+  display: block;
+  width: 100%;
+  padding: 0.85rem 1.5rem;
+  font-family: "Quicksand", sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #fff;
+  background: linear-gradient(135deg, var(--rose-light), var(--rose));
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+  box-shadow: 0 4px 20px var(--shadow);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.btn-modal-ok:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 28px var(--shadow);
+}
+
+.modal-pros-cons {
+  max-width: min(560px, 95vw);
+}
+
+.modal-pros-cons .modal-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 1.25rem;
+  text-align: center;
+}
+
+.pros-cons-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.pros-cons-heading {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 0.5rem;
+}
+
+.pros-carousel {
+  background: rgba(255, 182, 193, 0.25);
+  border-radius: 12px;
+  padding: 1rem;
+  min-height: 100px;
+}
+
+.pros-carousel-content {
+  font-size: 0.95rem;
+  color: var(--text);
+  margin-bottom: 0.75rem;
+  min-height: 2.5em;
+}
+
+.pros-carousel-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.pros-carousel-btn {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: var(--rose-light);
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.pros-carousel-btn:hover {
+  transform: scale(1.1);
+}
+
+.pros-carousel-counter {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--rose-dark);
+}
+
+.cons-panel .cons-content {
+  background: rgba(255, 182, 193, 0.2);
+  border-radius: 12px;
+  padding: 1rem;
+  text-align: center;
+}
+
+.cons-image-placeholder {
+  font-size: 2.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.cons-text {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0;
+}
+
+@keyframes modalAppear {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* ----- Gift hub (cards to open Love Letter, Music, etc.) ----- */
+.gift-hub {
+  width: 100%;
+  max-width: min(560px, 92vw);
+  margin: 1.5rem auto 0;
+}
+
+.gift-hub-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 1rem;
+  text-align: center;
+}
+
+.gift-hub-cards {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.gift-hub-cards--center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.valentine-gifts-more {
+  width: 100%;
+  margin-top: 1.5rem;
+}
+
+.valentine-gifts-more-cards,
+.valentine-gifts-main-cards {
+  margin-bottom: 1rem;
+}
+
+.valentine-coupons-inline {
+  margin-top: 1rem;
+  width: 100%;
+}
+
+.gift-hub-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  background: rgba(255, 182, 193, 0.35);
+  border: 1px solid rgba(255, 182, 193, 0.5);
+  border-radius: 16px;
+  cursor: pointer;
+  font-family: "Quicksand", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--rose-dark);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.gift-hub-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px var(--shadow);
+}
+
+.gift-hub-icon {
+  font-size: 2.5rem;
+  line-height: 1;
+}
+
+.gift-hub-card--giftbox .gift-hub-card-image {
+  display: block;
+  width: auto;
+  height: auto;
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: contain;
+}
+
+.gift-hub-card--giftbox {
+  min-width: 140px;
+}
+
+.gift-hub-card--with-image .gift-hub-card-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 140px;
+  max-height: 120px;
+  object-fit: contain;
+}
+
+.gift-hub-card--with-image {
+  min-width: 140px;
+}
+
+.gift-hub-card--image-only {
+  background: transparent;
+  border: none;
+  padding: 0;
+  min-width: 0;
+  box-shadow: none;
+}
+
+.gift-hub-card--image-only:hover {
+  box-shadow: none;
+  transform: scale(1.05);
+}
+
+.gift-hub-card--image-only .gift-hub-card-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 160px;
+  object-fit: contain;
+}
+
+/* ----- Extra screens (Love Letter, Music, Gifts, Every Moment) ----- */
+.screen-extra {
+  z-index: 20;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  background: transparent;
+}
+
+.extra-content {
+  width: 100%;
+  max-width: min(640px, 92vw);
+  padding: 2rem 1rem 3rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.extra-content .btn-yes {
+  margin-top: auto;
+  padding: 0.5rem 1.25rem;
+  padding-top: 2rem;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+/* Love letter */
+.extra-love-letter {
+  text-align: center;
+  max-width: min(800px, 95vw);
+}
+
+.love-letter-title {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 1rem;
+}
+
+.love-letter-envelope {
+  font-size: 4rem;
+  margin: 0 0 1.5rem;
+}
+
+.love-letter-body {
+  text-align: left;
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 182, 193, 0.4);
+}
+
+.love-letter-greeting {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 1rem;
+}
+
+.love-letter-para {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: var(--text);
+  margin: 0 0 1rem;
+}
+
+.drop-cap {
+  font-family: "Playfair Display", serif;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  float: left;
+  line-height: 1;
+  margin-right: 0.25rem;
+}
+
+.love-letter-signature {
+  text-align: right;
+  margin: 1.5rem 0 0;
+  font-size: 1rem;
+  color: var(--text);
+}
+
+/* Music player */
+.extra-music {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.music-player-card {
+  width: 100%;
+  background: #fff;
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: var(--card-shadow);
+  margin-bottom: 1.5rem;
+}
+
+.music-album-wrap {
+  display: flex;
+  gap: 1.25rem;
+  align-items: flex-start;
+}
+
+.music-album-art {
+  width: 100px;
+  height: 100px;
+  flex-shrink: 0;
+  border-radius: 12px;
+  background: linear-gradient(145deg, #ffe8ed, #ffdce4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+}
+
+.music-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.music-track {
+  font-family: "Playfair Display", serif;
+  font-size: 1.35rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 0.75rem;
+}
+
+.music-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.music-seek {
+  flex: 1;
+  height: 6px;
+  accent-color: var(--rose);
+}
+
+.music-time {
+  font-size: 0.8rem;
+  color: var(--text);
+  opacity: 0.8;
+}
+
+.music-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+}
+
+.music-ctrl {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 182, 193, 0.4);
+  color: var(--rose-dark);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.music-ctrl:hover {
+  transform: scale(1.1);
+}
+
+.music-play {
+  width: 3rem;
+  height: 3rem;
+  font-size: 1.2rem;
+  background: linear-gradient(135deg, var(--rose-light), var(--rose));
+  color: #fff;
+}
+
+.music-playlist-title {
+  font-family: "Playfair Display", serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 0.75rem;
+}
+
+.music-playlist-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1.5rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.music-playlist-list li {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 182, 193, 0.3);
+  font-size: 0.95rem;
+  color: var(--text);
+}
+
+.music-playlist-list li:last-child {
+  border-bottom: none;
+}
+
+.music-playlist-list li.playing {
+  background: rgba(255, 182, 193, 0.25);
+  font-weight: 600;
+  color: var(--rose-dark);
+}
+
+/* Valentine gifts (3 cards + celebration) */
+.extra-valentine-gifts {
+  text-align: center;
+  max-width: min(800px, 95vw);
+}
+
+.valentine-gifts-hero-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-width: 140px;
+  margin: 0 auto 1rem;
+}
+
+.extra-coupons {
+  text-align: center;
+}
+
+.valentine-gifts-title {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 1.5rem;
+}
+
+.valentine-gifts-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.valentine-gift-card {
+  position: relative;
+  width: 140px;
+  height: 140px;
+  padding: 0;
+  border: none;
+  border-radius: 16px;
+  background: linear-gradient(145deg, #ffe8ed, #ffdce4);
+  box-shadow: 0 8px 24px var(--shadow);
+  cursor: pointer;
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.valentine-gift-card:hover:not(.opened) {
+  transform: scale(1.05);
+}
+
+.valentine-gift-card .valentine-gift-cover,
+.valentine-gift-card .valentine-gift-reveal {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Quicksand", sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--rose-dark);
+}
+
+.valentine-gift-card .valentine-gift-reveal {
+  display: none;
+  font-size: 2.5rem;
+}
+
+.valentine-gift-card.opened .valentine-gift-cover {
+  display: none;
+}
+
+.valentine-gift-card.opened .valentine-gift-reveal {
+  display: flex;
+  animation: imagePop 0.4s ease;
+}
+
+.valentine-gifts-celebration {
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 182, 193, 0.3);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 182, 193, 0.5);
+}
+
+.valentine-gifts-celebration.hidden {
+  display: none !important;
+}
+
+.valentine-gifts-bear {
+  font-size: 4rem;
+  margin-bottom: 0.5rem;
+}
+
+.valentine-gifts-message {
+  font-family: "Playfair Display", serif;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0;
+}
+
+/* Every Moment grid */
+.extra-every-moment {
+  text-align: center;
+  max-width: min(800px, 95vw);
+}
+
+.every-moment-title {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(1.5rem, 4vw, 2rem);
+  font-weight: 700;
+  color: var(--rose-dark);
+  margin: 0 0 1.5rem;
+}
+
+.every-moment-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  max-width: 560px;
+  margin: 0 auto;
+}
+
+.every-moment-card {
+  background: #fff;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  border: 1px solid rgba(255, 182, 193, 0.3);
+}
+
+.every-moment-card img {
+  width: 100%;
+  aspect-ratio: 1;
+  object-fit: cover;
+  display: block;
+}
+
+.every-moment-card-caption {
+  padding: 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--rose-dark);
+  text-align: center;
 }
 
 /* Menu / nav: use class .page-menu or .page-nav and z-index stays below header (10) */

@@ -1,11 +1,12 @@
-﻿(function () {
+(function () {
   "use strict";
 
   // --- Config (secret word can be overridden via data attribute on body or form)
   var SECRET_WORD_DEFAULT = "mama";
   var NO_BUTTON_RUN_SPEED = 80;
   var CONFETTI_COUNT = 60;
-  var FLOATING_HEARTS_COUNT = 12;
+  var FLOATING_HEARTS_COUNT = 50;
+  var FALLING_HEARTS_COUNT = 24;
   var HEART_SYMBOLS = ["♥", "💕", "💗", "❤", "💖"];
   var SLIDESHOW_AUTO_INTERVAL_MS = 9000;
   var SUCCESS_AUTO_NEXT_MS = 10000;
@@ -21,7 +22,7 @@
     var name = rawPath.replace(/^photos\//, "");
     var lastDot = name.lastIndexOf(".");
     var base = lastDot === -1 ? name : name.slice(0, lastDot);
-    return base.replace( new RegExp(APOSTROPHE_CURLY, "g"), "'" );
+    return base.replace(new RegExp(APOSTROPHE_CURLY, "g"), "'");
   }
 
   function encodePhotoPath(rawPath) {
@@ -69,10 +70,25 @@
     };
   });
 
+  // Every Moment with You: images from assets folder (browsers don't support .heic; use .jpeg/.jpg/.png)
+  var EVERY_MOMENT_ASSETS_RAW = [
+    { path: "assets/Mirrir Selfi.jpg", caption: "First kiss" },
+    { path: "assets/First date.jpg", caption: "First kiss" },
+    { path: "assets/Ice Rink.jpg", caption: "First kiss" },
+    { path: "assets/First kiss.jpeg", caption: "First kiss" },
+  ];
+  var EVERY_MOMENT_ASSETS = EVERY_MOMENT_ASSETS_RAW.map(function (item) {
+    return {
+      src: encodePhotoPath(item.path),
+      caption: item.caption
+    };
+  });
+
   // --- DOM refs
   var screenWelcome = document.getElementById("screenWelcome");
   var screenCard = document.getElementById("screenCard");
   var screenSuccess = document.getElementById("screenSuccess");
+  var successHugVideo = document.getElementById("successHugVideo");
   var btnOpenWelcome = document.getElementById("btnOpenWelcome");
   var btnYes = document.getElementById("btnYes");
   var btnNo = document.getElementById("btnNo");
@@ -81,7 +97,9 @@
   var successChangeMindWrap = document.getElementById("successChangeMindWrap");
   var successChangeMindBtn = document.getElementById("successChangeMindBtn");
   var btnActuallyNo = document.getElementById("btnActuallyNo");
+  var btnSuccessNo = document.getElementById("btnSuccessNo");
   var successBelowContent = document.getElementById("successBelowContent");
+  var successRulesCard = document.getElementById("successRulesCard");
   var successHearts = document.getElementById("successHearts");
   var giftGallery = document.getElementById("giftGallery");
   var secretWordForm = document.getElementById("secretWordForm");
@@ -97,6 +115,49 @@
   var memorySlideshowNext = document.getElementById("memorySlideshowNext");
   var floatingHeartsContainer = document.getElementById("floatingHearts");
   var buttonsContainer = document.querySelector(".screen-card-buttons");
+  var perksModal = document.getElementById("perksModal");
+  var perksModalOk = document.getElementById("perksModalOk");
+  var perksModalClose = document.getElementById("perksModalClose");
+  var prosConsModal = document.getElementById("prosConsModal");
+  var prosConsModalOk = document.getElementById("prosConsModalOk");
+  var prosConsModalClose = document.getElementById("prosConsModalClose");
+  var prosCarouselContent = document.getElementById("prosCarouselContent");
+  var prosCarouselCounter = document.getElementById("prosCarouselCounter");
+  var prosCarouselPrev = document.getElementById("prosCarouselPrev");
+  var prosCarouselNext = document.getElementById("prosCarouselNext");
+  var screenLoveLetter = document.getElementById("screenLoveLetter");
+  var screenValentineGifts = document.getElementById("screenValentineGifts");
+  var screenEveryMoment = document.getElementById("screenEveryMoment");
+  var loveLetterBackToGifts = document.getElementById("loveLetterBackToGifts");
+  var valentineGiftsBackToLove = document.getElementById("valentineGiftsBackToLove");
+  var everyMomentBackToGifts = document.getElementById("everyMomentBackToGifts");
+  var everyMomentGrid = document.getElementById("everyMomentGrid");
+  var quizSection = document.getElementById("quizSection");
+  var quizQuestionEl = document.getElementById("quizQuestion");
+  var quizOptionsEl = document.getElementById("quizOptions");
+  var quizProgressEl = document.getElementById("quizProgress");
+  var quizCompleteModal = document.getElementById("quizCompleteModal");
+  var quizCompleteOk = document.getElementById("quizCompleteOk");
+  var secretWordSection = document.getElementById("secretWordSection");
+
+  var QUIZ_QUESTIONS = [
+    { question: "What is my favorite color?", options: ["Pink", "Red", "Black", "Blue"] },
+    { question: "Enter my phone number", inputType: "phone" },
+    { question: "My favorite food?", options: ["Biryani", "Chicken", "Dosa", "Whatever you make 💕"] },
+    { question: "What am I addicted to?", options: ["You!", "Us", "Your smile", "Our moments together 💕"] }
+  ];
+  var quizIndex = 0;
+  var quizPhoneNumber = "";
+
+  var PROS_ITEMS = [
+    "Unlimited comfort and care",
+    "Someone who always has your back",
+    "Endless laughs and silly moments",
+    "A best friend and partner in one",
+    "Countless hugs and cuddles",
+    "Love that grows every single day"
+  ];
+  var prosCarouselIndex = 0;
 
   var noMessages = [
     "I think ne thappa NO click panna try pannara da papa...",
@@ -117,8 +178,8 @@
     var form = document.getElementById("secretWordForm");
     var section = document.getElementById("secretWordSection");
     var word = (form && form.getAttribute("data-secret-word")) ||
-               (section && section.getAttribute("data-secret-word")) ||
-               (document.body && document.body.getAttribute("data-secret-word"));
+      (section && section.getAttribute("data-secret-word")) ||
+      (document.body && document.body.getAttribute("data-secret-word"));
     return (word && word.trim()) ? word.trim().toLowerCase() : SECRET_WORD_DEFAULT;
   }
 
@@ -163,7 +224,24 @@
           heart.style.animationDelay = Math.random() * 4 + "s";
           heart.style.animationDuration = (12 + Math.random() * 6) + "s";
           floatingHeartsContainer.appendChild(heart);
-        }, index * 400);
+        }, index * 120);
+      })(i);
+    }
+  }
+
+  function spawnFallingHearts() {
+    if (!floatingHeartsContainer) return;
+    for (var i = 0; i < FALLING_HEARTS_COUNT; i++) {
+      (function (index) {
+        setTimeout(function () {
+          var heart = document.createElement("span");
+          heart.className = "heart heart-fall";
+          heart.textContent = HEART_SYMBOLS[index % HEART_SYMBOLS.length];
+          heart.style.left = Math.random() * 100 + "%";
+          heart.style.animationDelay = Math.random() * 0.8 + "s";
+          heart.style.animationDuration = (14 + Math.random() * 6) + "s";
+          floatingHeartsContainer.appendChild(heart);
+        }, index * 50);
       })(i);
     }
   }
@@ -209,21 +287,6 @@
     if (btnNo) btnNo.style.transform = "";
   }
 
-  function moveActuallyNoButton() {
-    if (!btnActuallyNo) return;
-    var rect = btnActuallyNo.getBoundingClientRect();
-    var padding = 60;
-    var maxDeltaX = Math.max(200, window.innerWidth / 2 - rect.width - padding);
-    var maxDeltaY = Math.max(150, window.innerHeight / 2 - rect.height - padding);
-    var deltaX = getRandomOffset(maxDeltaX);
-    var deltaY = getRandomOffset(maxDeltaY);
-    btnActuallyNo.style.transform = "translate(" + deltaX + "px, " + deltaY + "px)";
-  }
-
-  function resetActuallyNoButton() {
-    if (btnActuallyNo) btnActuallyNo.style.transform = "";
-  }
-
   function initNoButton() {
     if (!btnNo || !buttonsContainer) return;
     btnNo.addEventListener("mouseenter", moveNoButton);
@@ -233,17 +296,6 @@
       moveNoButton();
     }, { passive: false });
     buttonsContainer.addEventListener("mouseleave", resetNoButton);
-  }
-
-  function initActuallyNoButton() {
-    if (!btnActuallyNo || !successChangeMindWrap) return;
-    btnActuallyNo.addEventListener("mouseenter", moveActuallyNoButton);
-    btnActuallyNo.addEventListener("focus", moveActuallyNoButton);
-    btnActuallyNo.addEventListener("touchstart", function (e) {
-      e.preventDefault();
-      moveActuallyNoButton();
-    }, { passive: false });
-    successChangeMindWrap.addEventListener("mouseleave", resetActuallyNoButton);
   }
 
   // Coupon click → reveal only this one; hide others when another is selected
@@ -276,6 +328,63 @@
       var kissesCount = 10 + (secretWordAttemptCount - 3) * 5;
       secretWordError.textContent = "Now you have no other choice give me " + kissesCount + " kisses to get the hint 💕";
     }
+  }
+
+  function goToNextQuizQuestion() {
+    quizIndex += 1;
+    if (quizIndex >= QUIZ_QUESTIONS.length) {
+      if (quizCompleteModal) quizCompleteModal.classList.remove("hidden");
+    } else {
+      renderQuizQuestion();
+    }
+  }
+
+  function renderQuizQuestion() {
+    if (!quizQuestionEl || !quizOptionsEl || !quizProgressEl) return;
+    if (quizIndex >= QUIZ_QUESTIONS.length) {
+      if (quizCompleteModal) quizCompleteModal.classList.remove("hidden");
+      return;
+    }
+    var q = QUIZ_QUESTIONS[quizIndex];
+    quizQuestionEl.textContent = q.question;
+    quizOptionsEl.innerHTML = "";
+
+    if (q.inputType === "phone") {
+      var input = document.createElement("input");
+      input.type = "tel";
+      input.className = "quiz-phone-input";
+      input.placeholder = "Enter phone number";
+      input.setAttribute("aria-label", "Enter my phone number");
+      input.autocomplete = "tel";
+      var nextBtn = document.createElement("button");
+      nextBtn.type = "button";
+      nextBtn.className = "quiz-option-btn quiz-next-btn";
+      nextBtn.textContent = "Next";
+      nextBtn.addEventListener("click", function () {
+        quizPhoneNumber = (input.value || "").trim();
+        goToNextQuizQuestion();
+      });
+      quizOptionsEl.appendChild(input);
+      quizOptionsEl.appendChild(nextBtn);
+    } else {
+      q.options.forEach(function (opt) {
+        var btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = "quiz-option-btn";
+        btn.textContent = opt;
+        btn.addEventListener("click", function () {
+          goToNextQuizQuestion();
+        });
+        quizOptionsEl.appendChild(btn);
+      });
+    }
+    quizProgressEl.textContent = "Question " + (quizIndex + 1) + " of " + QUIZ_QUESTIONS.length;
+  }
+
+  function initQuiz() {
+    if (!quizSection || !quizQuestionEl || !quizOptionsEl) return;
+    quizIndex = 0;
+    renderQuizQuestion();
   }
 
   function initSecretWord() {
@@ -374,16 +483,103 @@
     }
   }
 
-  // --- Wire UI
+  // --- Wire UI: gift opens (lid animation) then navigates to next screen
   if (btnOpenWelcome) {
     btnOpenWelcome.addEventListener("click", function () {
-      showScreen(screenCard);
+      if (this.classList.contains("open")) {
+        showScreen(screenCard);
+        return;
+      }
+      this.classList.add("open");
+      setTimeout(function () {
+        showScreen(screenCard);
+      }, 400);
     });
   }
 
   function moveToSuccessNextScreen() {
     if (successChangeMindWrap) successChangeMindWrap.classList.add("hidden");
     if (successBelowContent) successBelowContent.classList.remove("hidden");
+    if (successRulesCard) successRulesCard.classList.remove("hidden");
+  }
+
+  function showModal(el) {
+    if (el) el.classList.remove("hidden");
+  }
+  function hideModal(el) {
+    if (el) el.classList.add("hidden");
+  }
+
+  function showExtraScreen(extraScreen) {
+    if (!extraScreen) return;
+    if (screenSuccess) screenSuccess.classList.add("hidden");
+    [screenLoveLetter, screenValentineGifts, screenEveryMoment].forEach(function (s) {
+      if (s) s.classList.add("hidden");
+    });
+    extraScreen.classList.remove("hidden");
+  }
+
+  function backToSuccess() {
+    [screenLoveLetter, screenValentineGifts, screenEveryMoment].forEach(function (s) {
+      if (s) s.classList.add("hidden");
+    });
+    if (screenSuccess) screenSuccess.classList.remove("hidden");
+  }
+
+  function backToValentineGifts() {
+    if (screenLoveLetter) screenLoveLetter.classList.add("hidden");
+    if (screenEveryMoment) screenEveryMoment.classList.add("hidden");
+    if (screenValentineGifts) screenValentineGifts.classList.remove("hidden");
+  }
+
+  function initBackToGiftsButtons() {
+    if (loveLetterBackToGifts) loveLetterBackToGifts.addEventListener("click", backToValentineGifts);
+    if (valentineGiftsBackToLove) valentineGiftsBackToLove.addEventListener("click", backToSuccess);
+    if (everyMomentBackToGifts) everyMomentBackToGifts.addEventListener("click", backToValentineGifts);
+  }
+
+  function updateProsCarousel() {
+    if (prosCarouselContent) {
+      prosCarouselContent.textContent = PROS_ITEMS[prosCarouselIndex] || "";
+    }
+    if (prosCarouselCounter) {
+      prosCarouselCounter.textContent = (prosCarouselIndex + 1) + "/" + PROS_ITEMS.length;
+    }
+  }
+
+  function initProsCarousel() {
+    updateProsCarousel();
+    if (prosCarouselPrev) {
+      prosCarouselPrev.addEventListener("click", function () {
+        prosCarouselIndex = (prosCarouselIndex - 1 + PROS_ITEMS.length) % PROS_ITEMS.length;
+        updateProsCarousel();
+      });
+    }
+    if (prosCarouselNext) {
+      prosCarouselNext.addEventListener("click", function () {
+        prosCarouselIndex = (prosCarouselIndex + 1) % PROS_ITEMS.length;
+        updateProsCarousel();
+      });
+    }
+  }
+
+  function openProsConsAndThenSuccess() {
+    hideModal(prosConsModal);
+    runConfetti();
+    showScreen(screenSuccess);
+    if (successHugVideo) {
+      successHugVideo.currentTime = 0;
+      successHugVideo.play().catch(function () { /* autoplay policy may block unmuted */ });
+    }
+    fillSuccessHearts();
+    if (successAutoNextTimeoutId !== null) {
+      clearTimeout(successAutoNextTimeoutId);
+      successAutoNextTimeoutId = null;
+    }
+    successAutoNextTimeoutId = setTimeout(function () {
+      successAutoNextTimeoutId = null;
+      moveToSuccessNextScreen();
+    }, SUCCESS_AUTO_NEXT_MS);
   }
 
   if (btnYes) {
@@ -394,6 +590,10 @@
       }
       runConfetti();
       showScreen(screenSuccess);
+      if (successHugVideo) {
+        successHugVideo.currentTime = 0;
+        successHugVideo.play().catch(function () { /* autoplay policy may block unmuted */ });
+      }
       fillSuccessHearts();
       successAutoNextTimeoutId = setTimeout(function () {
         successAutoNextTimeoutId = null;
@@ -402,16 +602,105 @@
     });
   }
 
+  if (perksModalOk) {
+    perksModalOk.addEventListener("click", function () {
+      hideModal(perksModal);
+      showModal(prosConsModal);
+      prosCarouselIndex = 0;
+      updateProsCarousel();
+    });
+  }
+  if (perksModalClose) {
+    perksModalClose.addEventListener("click", function () {
+      hideModal(perksModal);
+      openProsConsAndThenSuccess();
+    });
+  }
+  if (prosConsModalOk) {
+    prosConsModalOk.addEventListener("click", function () {
+      openProsConsAndThenSuccess();
+      if (successAutoNextTimeoutId !== null) {
+        clearTimeout(successAutoNextTimeoutId);
+        successAutoNextTimeoutId = null;
+      }
+      moveToSuccessNextScreen();
+    });
+  }
+  if (prosConsModalClose) {
+    prosConsModalClose.addEventListener("click", openProsConsAndThenSuccess);
+  }
+
+  initProsCarousel();
+
+  function initGiftHub() {
+    function openExtra(id) {
+      var el = document.getElementById(id);
+      if (el) showExtraScreen(el);
+    }
+    if (document.getElementById("btnOpenLoveLetter")) {
+      document.getElementById("btnOpenLoveLetter").addEventListener("click", function () { openExtra("screenLoveLetter"); });
+    }
+    if (document.getElementById("btnOpenGifts")) {
+      document.getElementById("btnOpenGifts").addEventListener("click", function () { openExtra("screenValentineGifts"); });
+    }
+    if (document.getElementById("btnOpenMoments")) {
+      document.getElementById("btnOpenMoments").addEventListener("click", function () { openExtra("screenEveryMoment"); });
+    }
+  }
+
+  function initValentineGifts() {
+    /* Valentine gift boxes removed; gifts are now Love Letter, Every Moment, and Coupons. */
+  }
+
+  function initEveryMomentGrid() {
+    var items = EVERY_MOMENT_ASSETS.length ? EVERY_MOMENT_ASSETS : MEMORY_PHOTOS.slice(0, 4);
+    if (!everyMomentGrid || !items.length) return;
+    var captions = [
+      "Our first Mirror Selfi 📷",
+      "Our first Date 💕",
+      "Our first Outing 😉",
+      "Our first Kiss 😘"
+    ];
+    everyMomentGrid.innerHTML = "";
+    items.forEach(function (item, i) {
+      var card = document.createElement("div");
+      card.className = "every-moment-card";
+      var img = document.createElement("img");
+      img.src = item.src;
+      img.alt = item.caption;
+      img.loading = "lazy";
+      var cap = document.createElement("p");
+      cap.className = "every-moment-card-caption";
+      cap.textContent = captions[i] || item.caption;
+      card.appendChild(img);
+      card.appendChild(cap);
+      everyMomentGrid.appendChild(card);
+    });
+  }
+
+  initGiftHub();
+  initBackToGiftsButtons();
+  initValentineGifts();
+  initEveryMomentGrid();
+
   initNoButton();
-  initActuallyNoButton();
   initCoupons();
+  initQuiz();
   initSecretWord();
   initMemorySlideshow();
+
+  if (quizCompleteOk) {
+    quizCompleteOk.addEventListener("click", function () {
+      if (quizCompleteModal) quizCompleteModal.classList.add("hidden");
+      if (secretWordSection) secretWordSection.classList.remove("hidden");
+    });
+  }
 
   if (successChangeMindBtn) {
     successChangeMindBtn.addEventListener("click", function () {
       if (successChangeMindWrap) successChangeMindWrap.classList.add("hidden");
       if (successBelowContent) successBelowContent.classList.remove("hidden");
+      if (successRulesCard) successRulesCard.classList.remove("hidden");
     });
   }
 
@@ -421,10 +710,35 @@
         clearTimeout(successAutoNextTimeoutId);
         successAutoNextTimeoutId = null;
       }
-      runConfetti();
-      moveToSuccessNextScreen();
+      showModal(perksModal);
+    });
+  }
+
+  if (btnSuccessNo) {
+    btnSuccessNo.addEventListener("click", function () {
+      if (successAutoNextTimeoutId !== null) {
+        clearTimeout(successAutoNextTimeoutId);
+        successAutoNextTimeoutId = null;
+      }
+      if (successChangeMindWrap) successChangeMindWrap.classList.add("hidden");
+      if (successBelowContent) successBelowContent.classList.remove("hidden");
+      if (successRulesCard) successRulesCard.classList.add("hidden");
+      var videoWrap = document.getElementById("successHugVideoWrap");
+      if (videoWrap) {
+        videoWrap.classList.remove("hidden");
+        videoWrap.style.display = "";
+        videoWrap.style.visibility = "";
+      }
+      if (screenSuccess) {
+        screenSuccess.scrollTo(0, 0);
+        requestAnimationFrame(function () {
+          if (videoWrap) videoWrap.scrollIntoView({ block: "start", behavior: "auto" });
+          if (screenSuccess) screenSuccess.scrollTo(0, 0);
+        });
+      }
     });
   }
 
   spawnFloatingHearts();
+  spawnFallingHearts();
 })();

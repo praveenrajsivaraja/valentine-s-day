@@ -7,20 +7,59 @@
   <link rel="stylesheet" href="styles.css">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Quicksand:wght@500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Playfair+Display:wght@600;700&family=Quicksand:wght@500;600&family=Caveat:wght@500;600&display=swap" rel="stylesheet">
 </head>
 <body data-secret-word="mama">
   <div class="hearts-bg" aria-hidden="true"></div>
+  <div class="hearts-bg-big" aria-hidden="true">
+    <span class="heart-bg heart-bg--1">♥</span>
+    <span class="heart-bg heart-bg--2">♥</span>
+    <span class="heart-bg heart-bg--3">♥</span>
+    <span class="heart-bg heart-bg--4">♥</span>
+    <span class="heart-bg heart-bg--5">♥</span>
+    <span class="heart-bg heart-bg--6">♥</span>
+    <span class="heart-bg heart-bg--7">♥</span>
+    <span class="heart-bg heart-bg--8">♥</span>
+    <span class="heart-bg heart-bg--9">♥</span>
+    <span class="heart-bg heart-bg--10">♥</span>
+  </div>
   <div class="floating-hearts" id="floatingHearts" aria-hidden="true"></div>
 
-  <!-- Screen 1: A Secret Note For You -->
+  <!-- Screen 1: Home / Welcome -->
   <section class="screen screen-secret-note" id="screenWelcome">
-    <div class="secret-note-content">
-      <h1 class="secret-note-title">Hey gorgeous here is a Secret Note For You ❤️</h1>
-      <p class="secret-note-subtitle">Click the envelope to open it...</p>
-      <button type="button" class="envelope-btn" id="btnOpenWelcome" aria-label="Open envelope">
-        <span class="envelope-icon">✉️</span>
-      </button>
+    <div class="home-static-hearts" aria-hidden="true">
+      <span class="home-heart home-heart--big home-heart--1">♥</span>
+      <span class="home-heart home-heart--big home-heart--2">♥</span>
+      <span class="home-heart home-heart--big home-heart--3">♥</span>
+      <span class="home-heart home-heart--big home-heart--4">♥</span>
+      <span class="home-heart home-heart--big home-heart--5">♥</span>
+      <span class="home-heart home-heart--small home-heart--6">♥</span>
+      <span class="home-heart home-heart--small home-heart--7">♥</span>
+      <span class="home-heart home-heart--small home-heart--8">♥</span>
+      <span class="home-heart home-heart--small home-heart--9">♥</span>
+      <span class="home-heart home-heart--small home-heart--10">♥</span>
+      <span class="home-heart home-heart--small home-heart--11">💕</span>
+      <span class="home-heart home-heart--small home-heart--12">💕</span>
+      <span class="home-heart home-heart--small home-heart--13">♥</span>
+      <span class="home-heart home-heart--small home-heart--14">💗</span>
+      <span class="home-heart home-heart--small home-heart--15">♥</span>
+    </div>
+    <div class="secret-note-content home-content">
+      <h1 class="home-greeting">Hey Darling</h1>
+      <p class="home-tagline">I HAVE SOMETHING FOR YOU</p>
+      <div class="gift-tap-row">
+        <div class="gift-tap-left">
+          <p class="gift-tap-text">Tap to open...</p>
+          <svg class="gift-tap-arrow gift-tap-arrow-spring" viewBox="0 0 100 50" fill="none" aria-hidden="true">
+            <!-- Spring coil (wavy path) pointing to gift -->
+            <path class="spring-path" d="M 2 25 Q 14 12 26 25 Q 38 38 50 25 Q 62 12 74 25 Q 84 35 90 25" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+            <path class="spring-arrowhead" d="M 82 18 L 98 25 L 82 32" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+          </svg>
+        </div>
+        <button type="button" class="gift-container gift-container--image" id="btnOpenWelcome" aria-label="Open gift">
+          <img src="assets/gift-box-home.png" alt="Gift box - tap to open" class="gift-box-image" />
+        </button>
+      </div>
     </div>
   </section>
 
@@ -39,20 +78,66 @@
 
   <div class="confetti-container" id="confettiContainer" aria-hidden="true"></div>
 
+  <!-- Perks modal (after YES) -->
+  <div class="modal-overlay hidden" id="perksModal" role="dialog" aria-labelledby="perksModalTitle">
+    <div class="modal-card modal-perks">
+      <button type="button" class="modal-close" id="perksModalClose" aria-label="Close">&times;</button>
+      <h2 class="modal-title" id="perksModalTitle">Maybe I should explain the perks of being my Valentine... let me tell you</h2>
+      <p class="modal-emoji">😉</p>
+      <button type="button" class="btn btn-modal-ok" id="perksModalOk">OKAY</button>
+    </div>
+  </div>
+
+  <!-- Pros/Cons modal -->
+  <div class="modal-overlay hidden" id="prosConsModal" role="dialog" aria-labelledby="prosConsModalTitle">
+    <div class="modal-card modal-pros-cons">
+      <button type="button" class="modal-close" id="prosConsModalClose" aria-label="Close">&times;</button>
+      <h2 class="modal-title" id="prosConsModalTitle">Why You Should Choose me as Your Valentine ❤️</h2>
+      <div class="pros-cons-grid">
+        <div class="pros-panel">
+          <h3 class="pros-cons-heading">❤️ Pros</h3>
+          <div class="pros-carousel">
+            <div class="pros-carousel-content" id="prosCarouselContent"></div>
+            <div class="pros-carousel-nav">
+              <button type="button" class="pros-carousel-btn" id="prosCarouselPrev" aria-label="Previous">&lt;</button>
+              <span class="pros-carousel-counter" id="prosCarouselCounter">1/6</span>
+              <button type="button" class="pros-carousel-btn" id="prosCarouselNext" aria-label="Next">&gt;</button>
+            </div>
+          </div>
+        </div>
+        <div class="cons-panel">
+          <h3 class="pros-cons-heading">❌ Cons</h3>
+          <div class="cons-content">
+            <div class="cons-image-placeholder" aria-hidden="true">😊</div>
+            <p class="cons-text">Nothing!!!!</p>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-modal-ok" id="prosConsModalOk">Continue</button>
+    </div>
+  </div>
+
   <!-- Screen 3: Success -->
   <section class="screen screen-success success-message hidden" id="screenSuccess">
+    <div class="success-hug-video-wrap" id="successHugVideoWrap">
+      <video class="success-hug-video" id="successHugVideo" src="assets/Hug.mp4" autoplay muted playsinline loop aria-label="Hug video"></video>
+    </div>
+    <p class="teddy-hug-text">A big hug for saying YES! 💕</p>
     <p class="success-intro">Good choice Papa 😊</p>
     <p class="success-unlocked">You just unlocked unlimited hugs, kisses, and cuddles (redeemable very soon I promise)</p>
     <p class="success-forever">Now you're stuck with your ME forever ∞</p>
     <div class="success-change-mind-wrap" id="successChangeMindWrap">
       <button type="button" class="success-change-mind-btn" id="successChangeMindBtn">Wait... do you want to change your mind?</button>
-      <button type="button" class="btn btn-actually-no" id="btnActuallyNo" aria-label="Actually no">Actually... Yes 😈</button>
+      <div class="success-change-mind-buttons">
+        <button type="button" class="btn btn-actually-no" id="btnActuallyNo" aria-label="Actually no">Actually... Yes 😈</button>
+        <button type="button" class="btn btn-success-no" id="btnSuccessNo" aria-label="No">No</button>
+      </div>
     </div>
 
     <div class="success-below-content hidden" id="successBelowContent">
     <p class="success-hearts" id="successHearts" aria-hidden="true"></p>
 
-    <div class="success-rules-card">
+    <div class="success-rules-card" id="successRulesCard">
       <h3 class="success-rules-title">You already said YES, which means:</h3>
       <ul class="success-rules-list">
         <li>❌ No take-backs allowed</li>
@@ -63,52 +148,30 @@
       <p class="success-rules-footer">Deal with it 😉💕</p>
     </div>
 
-    <div class="virtual-date-section">
-      <h3 class="virtual-date-title">I have some Virtual Date Ideas 📱</h3>
-      <div class="virtual-date-list">
-        <div class="virtual-date-card virtual-date-card--pink">🎬 Netflix party + video call (I'll let you pick... maybe)</div>
-        <div class="virtual-date-card virtual-date-card--cream">🍕 Order the same food together & judge each other's eating habits</div>
-        <div class="virtual-date-card virtual-date-card--pink">🌙 Late night talks that somehow turn into sleeping thing</div>
-        <div class="virtual-date-card virtual-date-card--cream">🎵 Playlist exchange & argue about music taste (you're wrong btw)</div>
-        <div class="virtual-date-card virtual-date-card--pink">📸 Send me your selfies so I can simp shamelessly 🥰</div>
-        <div class="virtual-date-card virtual-date-card--cream">🎮 Play games together & watch you absolutely destroy me</div>
+    <div class="gift-hub" id="giftHub">
+      <h3 class="gift-hub-title">Your Valentine Gifts 💕</h3>
+      <div class="gift-hub-cards gift-hub-cards--center">
+        <button type="button" class="gift-hub-card gift-hub-card--image-only" id="btnOpenGifts" data-screen="screenValentineGifts" aria-label="Open Gifts">
+          <img src="assets/gift-box-home.png" alt="Open Gifts" class="gift-hub-card-image" />
+        </button>
       </div>
     </div>
 
-    <p class="gift-section-title">Your coupons from me 💕</p>
-    <p class="gift-reveal-hint">Click a coupon to reveal it</p>
-    <div class="gift-wrap" id="giftWrap">
-      <div class="gift-inside visible" id="giftInside" aria-hidden="false">
-        <div class="gift-gallery gift-gallery--cards" id="giftGallery">
-          <div class="gift-coupon-item" data-coupon="1">
-            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 1">🎁 Coupon 1</button>
-            <div class="gift-coupon-text"> A day of yes pass</div>
-          </div>
-          <div class="gift-coupon-item" data-coupon="2">
-            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 2">🎁 Coupon 2</button>
-            <div class="gift-coupon-text"> An unlimited kiss pass</div>
-          </div>
-          <div class="gift-coupon-item" data-coupon="3">
-            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 3">🎁 Coupon 3</button>
-            <div class="gift-coupon-text"> A unlimited hug pass</div>
-          </div>
-          <div class="gift-coupon-item" data-coupon="4">
-            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 4">🎁 Coupon 4</button>
-            <div class="gift-coupon-text">An Unlimited cuddle pass</div>
-          </div>
-          <div class="gift-coupon-item" data-coupon="5">
-            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 5">🎁 Coupon 5</button>
-            <div class="gift-coupon-text"> One "Do a dare" pass</div>
-          </div>
-          <div class="gift-coupon-item" data-coupon="6">
-            <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 6">🎁 Coupon 6</button>
-            <div class="gift-coupon-text"> One "As you wish" pass</div>
-          </div>
-        </div>
+    <div class="quiz-section" id="quizSection">
+      <h3 class="quiz-title">Quick quiz for you 💕</h3>
+      <p class="quiz-question" id="quizQuestion"></p>
+      <div class="quiz-options" id="quizOptions"></div>
+      <p class="quiz-progress" id="quizProgress" aria-live="polite"></p>
+    </div>
+
+    <div class="modal-overlay hidden" id="quizCompleteModal" role="dialog" aria-labelledby="quizCompleteTitle">
+      <div class="modal-card modal-quiz-complete">
+        <h2 class="modal-title" id="quizCompleteTitle">You are always right darling 💕</h2>
+        <button type="button" class="btn btn-modal-ok" id="quizCompleteOk">Continue</button>
       </div>
     </div>
 
-    <div class="secret-word-section" id="secretWordSection" data-secret-word="i love you darloos">
+    <div class="secret-word-section hidden" id="secretWordSection" data-secret-word="i love you darloos">
       <h3 class="secret-word-title">Enter the special word only we know 🔐</h3>
       <p class="secret-word-hint">Type the word we use just between us</p>
       <form class="secret-word-form" id="secretWordForm" novalidate>
@@ -134,6 +197,84 @@
         <p class="memory-slideshow-caption" id="memorySlideshowCaption"></p>
         <button type="button" class="memory-slideshow-close" id="memorySlideshowClose" aria-label="Close slideshow">Close</button>
       </div>
+    </div>
+  </section>
+
+  <!-- Love Letter screen -->
+  <section class="screen screen-extra hidden" id="screenLoveLetter">
+    <div class="extra-content extra-love-letter">
+      <h1 class="love-letter-title">To the Girl I Love most! ❤️</h1>
+      <div class="love-letter-envelope" aria-hidden="true">✉️</div>
+      <div class="love-letter-body">
+        <p class="love-letter-greeting">My Dearest Wifee,</p>
+        <p class="love-letter-para"><span class="drop-cap">I</span> fell for you in a way I never expected, and now every day feels brighter just because you're in it.</p>
+        <p class="love-letter-para"><span class="drop-cap">L</span>oving you comes so naturally. It's in your smile, your laugh, and the comfort I feel whenever I'm with you.</p>
+        <p class="love-letter-para"><span class="drop-cap">Y</span>ou are my favorite part of every moment, and the best thing that ever happened to me.</p>
+        <p class="love-letter-signature">Forever yours,<br><strong>Praveenraj Madhumitha</strong></p>
+      </div>
+      <button type="button" class="btn btn-yes" id="loveLetterBackToGifts" aria-label="Back to Gifts">Back to Gifts</button>
+    </div>
+  </section>
+
+  <!-- Your Valentine Gifts (Love Letter, Every Moment, Coupons) -->
+  <section class="screen screen-extra hidden" id="screenValentineGifts">
+    <div class="extra-content extra-valentine-gifts">
+      <img src="assets/gift-box-home.png" alt="" class="valentine-gifts-hero-image" aria-hidden="true" />
+      <h1 class="valentine-gifts-title">Your Valentine Gifts ❤️</h1>
+      <div class="gift-hub-cards valentine-gifts-main-cards">
+        <button type="button" class="gift-hub-card gift-hub-card--with-image" id="btnOpenLoveLetter" data-screen="screenLoveLetter">
+          <img src="assets/Love Letter.png" alt="Love Letter" class="gift-hub-card-image" />
+          <span class="gift-hub-label"></span>
+        </button>
+        <button type="button" class="gift-hub-card gift-hub-card--with-image" id="btnOpenMoments" data-screen="screenEveryMoment">
+          <img src="assets/Memoris.png" alt="Every Moment" class="gift-hub-card-image" />
+          <span class="gift-hub-label"></span>
+        </button>
+      </div>
+      <div class="valentine-coupons-inline">
+        <h3 class="gift-section-title">Your coupons from me 💕</h3>
+        <p class="gift-reveal-hint">Click a coupon to reveal it</p>
+        <div class="gift-wrap" id="giftWrap">
+          <div class="gift-inside visible" id="giftInside" aria-hidden="false">
+            <div class="gift-gallery gift-gallery--cards" id="giftGallery">
+              <div class="gift-coupon-item" data-coupon="1">
+                <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 1">🎁 Coupon 1</button>
+                <div class="gift-coupon-text"> A day of yes pass</div>
+              </div>
+              <div class="gift-coupon-item" data-coupon="2">
+                <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 2">🎁 Coupon 2</button>
+                <div class="gift-coupon-text"> An unlimited kiss pass</div>
+              </div>
+              <div class="gift-coupon-item" data-coupon="3">
+                <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 3">🎁 Coupon 3</button>
+                <div class="gift-coupon-text"> A unlimited hug pass</div>
+              </div>
+              <div class="gift-coupon-item" data-coupon="4">
+                <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 4">🎁 Coupon 4</button>
+                <div class="gift-coupon-text">An Unlimited cuddle pass</div>
+              </div>
+              <div class="gift-coupon-item" data-coupon="5">
+                <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 5">🎁 Coupon 5</button>
+                <div class="gift-coupon-text"> One "Do a dare" pass</div>
+              </div>
+              <div class="gift-coupon-item" data-coupon="6">
+                <button type="button" class="gift-coupon-cover" aria-label="Reveal coupon 6">🎁 Coupon 6</button>
+                <div class="gift-coupon-text"> One "As you wish" pass</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <button type="button" class="btn btn-yes" id="valentineGiftsBackToLove" aria-label="Back to Love">Back to Love</button>
+    </div>
+  </section>
+
+  <!-- Every Moment with You (photo grid) -->
+  <section class="screen screen-extra hidden" id="screenEveryMoment">
+    <div class="extra-content extra-every-moment">
+      <h1 class="every-moment-title">Every Moment with You! 📷</h1>
+      <div class="every-moment-grid" id="everyMomentGrid"></div>
+      <button type="button" class="btn btn-yes" id="everyMomentBackToGifts" aria-label="Back to Gifts">Back to Gifts</button>
     </div>
   </section>
 
