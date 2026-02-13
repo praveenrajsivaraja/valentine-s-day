@@ -142,7 +142,7 @@
 
   var QUIZ_QUESTIONS = [
     { question: "What is my favorite color?", options: ["Pink", "Red", "Black", "Blue"] },
-    { question: "Enter my phone number", inputType: "phone" },
+    { question: "What dress suts me well?", options: ["Shirt", "Polo Tshirt", "Tshirt"] },
     { question: "My favorite food?", options: ["Biryani", "Chicken", "Dosa", "Whatever you make 💕"] },
     { question: "What am I addicted to?", options: ["You!", "Us", "Your smile", "Our moments together 💕"] }
   ];
