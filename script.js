@@ -72,10 +72,10 @@
 
   // Every Moment with You: images from assets folder (browsers don't support .heic; use .jpeg/.jpg/.png)
   var EVERY_MOMENT_ASSETS_RAW = [
-    { path: "assets/Mirrir Selfi.jpg", caption: "First kiss" },
-    { path: "assets/First date.jpg", caption: "First kiss" },
-    { path: "assets/Ice Rink.jpg", caption: "First kiss" },
-    { path: "assets/First kiss.jpeg", caption: "First kiss" },
+    { path: "assets/Mirrir Selfi.jpg", caption: "Our first Mirror Selfi 📷" },
+    { path: "assets/First date.jpg", caption: "Our first Date 💕" },
+    { path: "assets/Ice Rink.jpg", caption: "Our first Outing 😉" },
+    { path: "assets/First kiss.jpeg", caption: "Our first Kiss 😘" },
   ];
   var EVERY_MOMENT_ASSETS = EVERY_MOMENT_ASSETS_RAW.map(function (item) {
     return {
